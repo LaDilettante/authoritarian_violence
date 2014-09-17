@@ -1,6 +1,7 @@
 data/*
 *.sublime-workspace
 
+<<<<<<< HEAD
 *.Rproj.user
 *.Rproj
 *.Rhistory
