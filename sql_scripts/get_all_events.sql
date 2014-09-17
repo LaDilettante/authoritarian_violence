@@ -1,50 +1,39 @@
-# ---- Exploratory ----
-SELECT * FROM dict_sector_types;
-# We find that sector_type_id 1 = religious, 2 = governmental, 
-# 3 = dissidents, 4 = business, 5 = other
+select * from simple_events limit 10;
 
-# ---- Get list of actor_id for dissidents and governments ----
-MUST USE dict_sector_mappings read manual pg 9
-# Now use that to get the actor_id of dissidents (sector_type_id = 3)
-CREATE TABLE IF NOT EXISTS my_tables.anh_dissidentList 
-AS (
-SELECT sector_id
-  , name
-  , description
-  , sector_type_id
-  , actor_id
-FROM dict_sectors 
-  JOIN dict_sector_actor_mappings 
-  USING(sector_id)
-WHERE sector_type_id = 3);
-# Do the same thing and get the actor_id of government actor (sector_type_id = 2)
-CREATE TABLE IF NOT EXISTS my_tables.anh_governmentList 
-AS (
-SELECT sector_id
-  , name
-  , description
-  , sector_type_id
-  , actor_id
-FROM dict_sectors 
-  JOIN dict_sector_actor_mappings 
-  USING(sector_id)
-WHERE sector_type_id = 2);
-
-# This took me 16000 secs
+# source_actor_id in dissidentList within that time frame
+DROP TABLE IF EXISTS my_tables.anh_disgov_interactions;
 CREATE TABLE IF NOT EXISTS my_tables.anh_disgov_interactions
 AS (
 SELECT 
   *
 FROM 
-  events
+  simple_events
 WHERE
   -- the dissident does something to the government
-  (source_actor_id IN (SELECT actor_id FROM my_tables.anh_dissidentList)
-    AND target_actor_id IN (SELECT actor_id FROM my_tables.anh_governmentList))
+  (source_actor_id IN 
+    (SELECT actor_id FROM my_tables.anh_dissidentList
+	 WHERE
+       simple_events.event_date BETWEEN my_tables.anh_dissidentList.start_date 
+									AND my_tables.anh_dissidentList.end_date)
+	AND target_actor_id IN 
+    (SELECT actor_id FROM my_tables.anh_governmentList
+     WHERE
+	   simple_events.event_date BETWEEN my_tables.anh_governmentList.start_date
+                                    AND my_tables.anh_governmentList.end_date)
+  )
   OR
   -- the government does something to the dissident
-  (source_actor_id IN (SELECT actor_id FROM my_tables.anh_governmentList)
-    AND target_actor_id IN (SELECT actor_id FROM my_tables.anh_dissidentList)));
+  (source_actor_id IN 
+    (SELECT actor_id FROM my_tables.anh_governmentList
+     WHERE 
+       simple_events.event_date BETWEEN my_tables.anh_governmentList.start_date
+                                    AND my_tables.anh_governmentList.end_date)
+    AND target_actor_id IN 
+    (SELECT actor_id FROM my_tables.anh_dissidentList
+     WHERE simple_events.event_date BETWEEN my_tables.anh_dissidentList.start_date 
+									AND my_tables.anh_dissidentList.end_date)
+  )
+);
 ALTER TABLE my_tables.anh_disgov_interactions 
   ADD PRIMARY KEY (event_ID);
 ALTER TABLE my_tables.anh_disgov_interactions
