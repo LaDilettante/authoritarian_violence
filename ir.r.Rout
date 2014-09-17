@@ -1,0 +1,58 @@
+
+R version 3.1.0 (2014-04-10) -- "Spring Dance"
+Copyright (C) 2014 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin10.8.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls())
+> ###
+> Y<-dget("http://www.stat.washington.edu/hoff/Code/hoff_2005_jasa/IR/Y")
+> 
+> n<-dim(Y)[1]
+> 
+> Xd<-dget("http://www.stat.washington.edu/hoff/Code/hoff_2005_jasa/IR/X.dist") #distance
+> Xd<-array(Xd,dim=c(n,n,1))/1000
+> 
+> Xp<-dget("http://www.stat.washington.edu/hoff/Code/hoff_2005_jasa/IR/X.pop") #pops
+> Xp<-log(matrix( Xp,nrow=n,ncol=1))
+> 
+> ###
+> 
+> source("http://www.stat.washington.edu/hoff/Code/hoff_2005_jasa/gbme.r")
+> 
+> ##
+> gbme(Y=Y,Xd=Xd,Xs=Xp,Xr=Xp,fam="poisson",k=2,odens=50)                       
+Warning message:
+glm.fit: fitted rates numerically 0 occurred 
+> 
+> source("http://www.stat.washington.edu/hoff/Code/hoff_2005_jasa/gbme.postana.r")
+              bd1         b0       bs1       br1       s2a      sab      s2b
+      -0.25406300 -36.255763 0.9902120 0.8580750 12.023774 5.784531 6.342777
+       0.04043053   6.236934 0.2301815 0.1679555  6.030267 1.483192 1.391758
+2.5%  -0.33700000 -49.678725 0.5799500 0.5189750  4.498800 3.506800 4.264825
+50%   -0.25600000 -36.147000 0.9735000 0.8540000 10.350500 5.564500 6.098500
+97.5% -0.17400000 -24.606250 1.5081250 1.2002500 25.651350 9.376975 9.454750
+            s2e         rho      s2z1      s2z2
+      1.4734510 0.987820000 0.9142420 1.0105880
+      0.1708252 0.006311532 0.3774671 0.3779444
+2.5%  1.1570000 0.973975000 0.4239000 0.4327250
+50%   1.4625000 0.988500000 0.8075000 0.9690000
+97.5% 1.8320000 0.997000000 1.8520000 1.8201750
+>  
+> 
+> proc.time()
+    user   system  elapsed 
+5311.931  320.614 5634.694 
