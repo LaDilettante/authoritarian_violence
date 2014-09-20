@@ -1,4 +1,5 @@
-CREATE TABLE my_tables.anh_dis_to_gov AS (
+DROP TABLE IF EXISTS my_tables.anh_dis_to_gov;
+CREATE TABLE IF NOT EXISTS my_tables.anh_dis_to_gov AS (
 SELECT e.*
   , d.sector_id AS source_sector_id
   , d.name AS source_sector_name
@@ -13,3 +14,4 @@ FROM event_data.simple_events AS e
 WHERE e.event_date BETWEEN d.start_date AND d.end_date
   AND e.event_date BETWEEN g.start_date AND g.end_date
 );
+  
