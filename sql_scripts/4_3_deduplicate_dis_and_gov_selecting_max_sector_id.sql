@@ -12,3 +12,14 @@ INNER JOIN (
  AND l.target_sector_id = r.m_target_actor_id
  AND l.event_id = r.event_id
 );
+
+ALTER TABLE my_tables.anh_dis_and_gov_dedup_final
+ADD PRIMARY KEY (event_id),
+ADD INDEX (source_actor_id),
+ADD INDEX (target_actor_id),
+ADD INDEX (source_sector_id),
+ADD INDEX (target_sector_id),
+ADD INDEX (source_country_id),
+ADD INDEX (target_country_id),
+ADD INDEX (eventtype_id),
+ADD INDEX (event_date);
