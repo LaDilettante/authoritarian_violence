@@ -8,7 +8,7 @@ SELECT i.*
   , cTargetInfo.COWCode AS target_country_COWCode
   , cSourceInfo.Name AS source_country_name
   , cSourceInfo.ISOA3Code AS source_country_ISOA3Code
-  , cSourceInfo.COWCode AS source_country_COWCoce
+  , cSourceInfo.COWCode AS source_country_COWCode
   , cTargetdd.wdicode AS target_country_wdicode
   , cTargetdd.dpicode AS target_country_dpicode
   , cTargetdd.democracy AS target_country_democracy
@@ -31,3 +31,15 @@ FROM my_tables.anh_dis_and_gov_dedup_final AS i
   JOIN event_data.dict_actors AS aTarget
 	ON i.target_actor_id = aTarget.actor_id
 );
+
+ALTER TABLE my_tables.anh_dis_and_gov_dedup_fullinfo
+ADD PRIMARY KEY (event_id),
+ADD INDEX (event_date),
+ADD INDEX (source_actor_id),
+ADD INDEX (target_actor_id),
+ADD INDEX (source_country_id),
+ADD INDEX (target_country_id),
+ADD INDEX (source_country_wdicode),
+ADD INDEX (target_country_wdicode),
+ADD INDEX (source_country_dpicode),
+ADD INDEX (target_country_dpicode);
