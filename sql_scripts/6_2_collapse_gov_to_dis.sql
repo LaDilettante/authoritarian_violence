@@ -3,7 +3,8 @@ ADD INDEX (event_id),
 ADD INDEX (event_date),
 ADD INDEX (goldstein),
 ADD INDEX (source_country_id),
-ADD INDEX (target_actor_id);
+ADD INDEX (target_actor_id),
+ADD INDEX (target_country_id);
 
 DROP TABLE IF EXISTS my_tables.anh_gov_to_dis_count;
 CREATE TABLE IF NOT EXISTS my_tables.anh_gov_to_dis_count AS (
@@ -12,6 +13,8 @@ SELECT i.*
   , cSourceInfo.Name AS source_country_name
   , cSourceInfo.ISOA3Code AS source_country_ISOA3Code
   , csourceInfo.COWCode AS source_country_COWCode
+  , cSourcedd.wdicode AS source_country_wdicode
+  , cSourcedd.dpicode AS source_country_dpicode
   , cSourcedd.democracy AS source_country_democracy
 FROM
 (SELECT target_actor_id
@@ -21,6 +24,7 @@ FROM
   , AVG(goldstein) as goldstein_avg
 FROM
   my_tables.anh_gov_to_dis
+WHERE source_country_id = target_country_id # Dis and gov same country
 GROUP BY YEAR(event_date), source_country_id, target_actor_id) i
 JOIN event_data.countries AS cSourceInfo
   ON i.source_country_id = cSourceInfo.id
