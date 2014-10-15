@@ -17,6 +17,6 @@ d_disgov_raw = fetch(qr_disgov, n=-1)
 
 
 d_disgov <- d_disgov_raw %>%
-  select(iso3c = target_country_ISOA3Code, year, 
-         country = target_country_name,
-         source_actor_name, source_actor_id, goldstein_avg)
+  group_by(year, source_actor_name, country) %>%
+  summarize(sum_event = sum(goldstein)) %>%
+  mutate(log_sum_event = log(sum_event + min(sum_event) + 1))
