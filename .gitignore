@@ -1,4 +1,5 @@
 data/*
+data/credentials.RData
 *.sublime-workspace
 
 *.Rproj.user
@@ -115,4 +116,3 @@ sympy-plots-for-*.tex/
 
 # xindy
 *.xdy
-
