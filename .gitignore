@@ -1,7 +1,7 @@
 data/*
+data/credentials.RData
 *.sublime-workspace
 
-<<<<<<< HEAD
 *.Rproj.user
 *.Rproj
 *.Rhistory
