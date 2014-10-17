@@ -11,9 +11,12 @@ f_install_and_load(packs)
 load("./data/credentials.RData") # Load credentials
 db.my_tables = dbConnect(MySQL(), dbname='my_tables', host=credentials[["host"]],
                          user=credentials[["username"]], password=credentials[["password"]])
-qr_disgov = dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_to_gov
+qr_disgov = dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_to_gov_count
                         WHERE target_country_democracy=0")
 d_disgov_raw = fetch(qr_disgov, n=-1)
+qr_disgov_sector = dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_to_gov_count_sector
+                        WHERE target_country_democracy=0")
+d_disgov_sector_raw = fetch(qr_disgov_sector, n=-1)
 
 
 d_disgov <- d_disgov_raw %>%

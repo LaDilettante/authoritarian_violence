@@ -8,7 +8,7 @@ f_install_and_load(packs)
 
 # ---- Set up data ----
 # event data
-load("./data/credentials.RData") # Load credentials
+load("./data/private/credentials.RData") # Load credentials
 db.my_tables = dbConnect(MySQL(), dbname='my_tables', host=credentials[["host"]],
                          user=credentials[["username"]], password=credentials[["password"]])
 qr_disgov = dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_to_gov_count
@@ -17,7 +17,8 @@ d_disgov_raw = fetch(qr_disgov, n=-1)
 d_disgov <- d_disgov_raw %>%
   select(iso3c = target_country_ISOA3Code, year, 
          country = target_country_name,
-         source_actor_name, source_actor_id, source_sector_name, goldstein_avg)
+         source_actor_name, source_actor_id, source_sector_name, 
+         goldstein_avg, goldstein_sum, goldstein_pos_count, goldstein_neg_count)
 
 qr_disgovsect <- dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_to_gov_count_sector
                                            WHERE target_country_democracy = 0")
@@ -25,7 +26,8 @@ d_disgovsect_raw <- fetch(qr_disgovsect, n=-1)
 d_disgovsect <- d_disgovsect_raw %>%
   select(iso3c = target_country_ISOA3Code, year, 
          country = target_country_name,
-         source_sector_id, source_sector_name, goldstein_avg)
+         source_sector_id, source_sector_name, 
+         goldstein_avg, goldstein_sum, goldstein_pos_count, goldstein_neg_count)
 
   
 
@@ -52,7 +54,7 @@ d_wdi <- d_wdi_raw %>%
   arrange(iso3c, year)
 
 # emil, royal, otherwise civilian
-d_geddes_raw <- read.table("./data/GWF Autocratic Regimes 1.2/GWF_AllPoliticalRegimes.txt", 
+d_geddes_raw <- read.table("./data/public/GWF Autocratic Regimes 1.2/GWF_AllPoliticalRegimes.txt", 
                            header=TRUE, sep="\t")
 d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
@@ -66,4 +68,4 @@ d_disgov_merged_full <- Reduce(function(...) merge(..., match=c("iso3c", "year")
 d_disgovsect_merged_full <-  Reduce(function(...) merge(..., match=c("iso3c", "year"), all.x=T, sort=T),
                                     list(d_disgovsect, d_dpi, d_wdi, d_geddes))
 
-save(d_disgov_merged_full, d_disgovsect_merged_full, file='./data/data_final.RData')
+save(d_disgov_merged_full, d_disgovsect_merged_full, file='./data/private/data_final.RData')

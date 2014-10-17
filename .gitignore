@@ -1,5 +1,4 @@
-data/*
-data/credentials.RData
+data/private/*
 *.sublime-workspace
 
 *.Rproj.user

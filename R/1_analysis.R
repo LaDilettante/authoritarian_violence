@@ -3,25 +3,37 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("lme4", "arm", "nlme", "dplyr", "ggplot2")
+packs <- c("lme4", "arm", "nlme", "plyr", "dplyr", "ggplot2")
 f_install_and_load(packs)
 # Load data
-load('./data/data_final.RData')
+load('./data/private/data_final.RData')
 
 # Rescale data
 vars <- c("liec", "legis_multi", "gdp", "gdppc", "milexp", 
           "gwf_military", "gwf_personal", "gwf_party", "gwf_monarchy")
-
 d_disgov_scaled <- modifyList(d_disgov_merged_full, 
   lapply(d_disgov_merged_full[,vars], f_center_and_scale))
 d_disgovsect_scaled <- modifyList(d_disgovsect_merged_full,
   lapply(d_disgovsect_merged_full[,vars], f_center_and_scale))
 
-fm_unrestricted <- formula("goldstein_avg ~ 1 + legis_multi + gdp + gdppc +
-                            (1 | country) + (1 | year) + (1 | source_actor_id)")
-fm_restricted <- formula("goldstein_avg ~ 1 + gdp + gdppc +
-                            (1 | country) + (1 | year) + (1 | source_actor_id)")
+# ---- Analysis ----
 
+# Create list of formula
+fm_controls <- "1 + gdp + gdppc + gwf_military + gwf_personal + gwf_party"
+fm_iv <- c("liec", "legis_multi")
+fm_dv <- c("goldstein_avg", "goldstein_sum", "goldstein_pos_count", "goldstein_neg_count")
+fm_re <- "(1 | country) + (1 | year) + (1 + legis_multi | source_sector_name)"
+fm_unrestricted_list <- sapply(do.call(paste, expand.grid(fm_dv, "~", fm_iv, "+", fm_controls, "+", fm_re)), formula)
+fm_restricted_list <- sapply(do.call(paste, expand.grid(fm_dv, "~", fm_controls, "+", fm_re)), formula)
+# Loop through each formula
+res_lmer <- list()
+for (i in seq_along(fm_unrestricted_list)) {
+  m_unrestricted <- lmer(fm_unrestricted_list[[i]], data=d_disgov_merged_full, REML=F)
+  m_restricted <- lmer(fm_restricted_list[[i]], data=d_disgov_merged_full, REML=F)
+  res_lmer[[i]] <- list(fm_unrestricted_list[[i]],
+                   fm_restricted_list[[i]],
+                   anova(m_unrestricted, m_restricted)["Pr(>Chisq)"])
+}
 #compute a model where the effect of status is estimated
 # REML = F since we want to compare the likelihood
 unrestricted_fit = lmer(data=d_merged_full, formula = fm_unrestricted, REML = F)
