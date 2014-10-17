@@ -1,4 +1,5 @@
 data/private/*
+writeups/*.pdf
 *.sublime-workspace
 
 *.Rproj.user
