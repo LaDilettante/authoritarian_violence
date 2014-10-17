@@ -1,11 +1,3 @@
-ALTER TABLE my_tables.anh_gov_to_dis
-ADD INDEX (event_id),
-ADD INDEX (event_date),
-ADD INDEX (goldstein),
-ADD INDEX (source_country_id),
-ADD INDEX (target_actor_id),
-ADD INDEX (target_country_id);
-
 DROP TABLE IF EXISTS my_tables.anh_gov_to_dis_count;
 CREATE TABLE IF NOT EXISTS my_tables.anh_gov_to_dis_count AS (
 SELECT i.*

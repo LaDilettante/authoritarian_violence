@@ -1,3 +1,4 @@
+# ---- dis_to_gov ----
 DROP TABLE IF EXISTS my_tables.anh_dis_to_gov;
 CREATE TABLE IF NOT EXISTS my_tables.anh_dis_to_gov AS (
 SELECT e.*
@@ -15,8 +16,17 @@ WHERE e.event_date BETWEEN IFNULL(d.start_date,"1900-01-01")
                        AND IFNULL(d.end_date,now())
   AND e.event_date BETWEEN IFNULL(g.start_date,"1900-01-01") 
                        AND IFNULL(g.end_date,now())
+GROUP BY e.event_id, e.location_id, e.event_date, e.source_actor_id, e.target_actor_id
 );
-  
+ALTER TABLE my_tables.anh_dis_to_gov
+ADD PRIMARY KEY (event_id),
+ADD INDEX (event_date),
+ADD INDEX (goldstein),
+ADD INDEX (source_actor_id),
+ADD INDEX (source_country_id),
+ADD INDEX (target_country_id);
+
+# ---- gov_to_dis ----
 DROP TABLE IF EXISTS my_tables.anh_gov_to_dis;
 CREATE TABLE IF NOT EXISTS my_tables.anh_gov_to_dis AS (
 SELECT e.*
@@ -34,7 +44,15 @@ WHERE e.event_date BETWEEN IFNULL(d.start_date,"1900-01-01")
                        AND IFNULL(d.end_date,now())
   AND e.event_date BETWEEN IFNULL(g.start_date,"1900-01-01") 
                        AND IFNULL(g.end_date,now())
+GROUP BY e.event_id, e.location_id, e.event_date, e.source_actor_id, e.target_actor_id
 );
+ALTER TABLE my_tables.anh_gov_to_dis
+ADD PRIMARY KEY (event_id),
+ADD INDEX (event_date),
+ADD INDEX (goldstein),
+ADD INDEX (source_country_id),
+ADD INDEX (target_actor_id),
+ADD INDEX (target_country_id);
   
 DROP TABLE IF EXISTS my_tables.anh_dis_to_dis;
 CREATE TABLE IF NOT EXISTS my_tables.anh_dis_to_dis AS (
@@ -53,6 +71,7 @@ WHERE e.event_date BETWEEN IFNULL(d1.start_date,"1900-01-01")
                        AND IFNULL(d1.end_date,now())
   AND e.event_date BETWEEN IFNULL(d2.start_date,"1900-01-01") 
                        AND IFNULL(d2.end_date,now())
+GROUP BY e.event_id, e.location_id, e.event_date, e.source_actor_id, e.target_actor_id
 );
 
 DROP TABLE IF EXISTS my_tables.anh_gov_to_gov;
@@ -72,4 +91,5 @@ WHERE e.event_date BETWEEN IFNULL(g1.start_date,"1900-01-01")
                        AND IFNULL(g1.end_date,now())
   AND e.event_date BETWEEN IFNULL(g2.start_date,"1900-01-01") 
                        AND IFNULL(g2.end_date,now())
+GROUP BY e.event_id, e.location_id, e.event_date, e.source_actor_id, e.target_actor_id
 );
