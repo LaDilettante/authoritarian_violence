@@ -23,17 +23,22 @@ fm_controls <- "1 + gdp + gdppc + gwf_military + gwf_personal + gwf_party"
 fm_iv <- c("liec", "legis_multi")
 fm_dv <- c("goldstein_avg", "goldstein_sum", "goldstein_pos_count", "goldstein_neg_count")
 fm_re <- "(1 | country) + (1 | year) + (1 + legis_multi | source_sector_name)"
-fm_unrestricted_list <- sapply(do.call(paste, expand.grid(fm_dv, "~", fm_iv, "+", fm_controls, "+", fm_re)), formula)
-fm_restricted_list <- sapply(do.call(paste, expand.grid(fm_dv, "~", fm_controls, "+", fm_re)), formula)
-# Loop through each formula
-res_lmer <- list()
-for (i in seq_along(fm_unrestricted_list)) {
-  m_unrestricted <- lmer(fm_unrestricted_list[[i]], data=d_disgov_merged_full, REML=F)
-  m_restricted <- lmer(fm_restricted_list[[i]], data=d_disgov_merged_full, REML=F)
-  res_lmer[[i]] <- list(fm_unrestricted_list[[i]],
-                   fm_restricted_list[[i]],
-                   anova(m_unrestricted, m_restricted)["Pr(>Chisq)"])
+
+res <- list()
+for (iv in fm_iv) {
+  res_lmer <- list()
+  for (dv in fm_dv) {
+    fm_unrestricted_list <- formula(paste(dv, "~", iv, "+", fm_controls, "+", fm_re))
+    fm_restricted_list <- formula(paste(dv, "~", fm_controls, "+", fm_re))
+    m_unrestricted <- lmer(fm_unrestricted_list, data=d_disgov_merged_full, REML=F)
+    m_restricted <- lmer(fm_restricted_list, data=d_disgov_merged_full, REML=F)
+    res_lmer[[dv]] <- anova(m_unrestricted, m_restricted)["Pr(>Chisq)"]
+  }
+  res[[iv]] <- res_lmer
 }
+
+# Loop through each formula
+
 #compute a model where the effect of status is estimated
 # REML = F since we want to compare the likelihood
 unrestricted_fit = lmer(data=d_merged_full, formula = fm_unrestricted, REML = F)
