@@ -46,7 +46,7 @@ unrestricted_fit = lmer(data=d_merged_full, formula = fm_unrestricted, REML = F)
 restricted_fit = lmer(data=d_merged_full, formula = fm_restricted, REML = F)
 anova(restricted_fit, unrestricted_fit)
 
-summary(unrestricted_fit)
+summary(lmer(paste("goldstein_sum ~ liec +", fm_controls, "+", fm_re), data=d_disgov_merged_full))
 
 #compute the AIC-corrected log-base-2 likelihood ratio (a.k.a. "bits" of evidence)
 #(AIC(restricted_fit)-AIC(unrestricted_fit))*log2(exp(1))
