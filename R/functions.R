@@ -12,9 +12,16 @@ f_center_and_scale <- function(vector, num.sd = 2) {
 }
 
 # Create an environment that contains the stata var labels
-f_extract_stata_label <- function(df) {
+f_stata_to_env <- function(df) {
   lab_env <- new.env()
   for (i in seq_along(names(df))) {
     lab_env[[names(df)[i]]] <- attr(df, "var.labels")[i]  
   }
+  return(lab_env)
+}
+
+f_stata_to_df <- function(df) {
+  lab_df <- data.frame(var.name = names(d_tmp),
+                       var.label = attr(d_tmp, "var.labels"))
+  return(lab_df)
 }
