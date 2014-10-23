@@ -1,0 +1,39 @@
+\documentclass[]{article}
+
+\usepackage{amsmath, amsfonts, amsthm, amssymb}
+
+% bibliography
+\usepackage{natbib}
+% \bibpunct{(}{)}{;}{a}{}{,}
+
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+
+\maketitle
+
+\begin{abstract}
+Discuss my data sources
+\end{abstract}
+
+\section{Ethnic fractionalization}
+
+\cite[p. 190]{Gandhi2008}. (1946-2002, but constant across the period). Degree of polarization among a country's ethnic groups. Calculated as $1 - \sum(0.5 - p_i)^2 \times \frac{p_i}{0.25}$, where$p_i$ is the share of the population that belongs to ethnic group $i$, as defined and measured in \cite{Fearon2003} (which also gives a number to a country instead of time series).
+
+\section{Violence}
+
+\section{Other democracies}
+
+Polity IV (1800 - 2012), \verb`polity_binary` is created as \verb`Polity2` $> 0$.
+
+Democracy and Dictatorship (1946 - 2008)
+
+
+\bibliographystyle{chicago}
+\bibliography{library}
+
+\end{document}
