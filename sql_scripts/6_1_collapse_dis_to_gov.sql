@@ -15,6 +15,15 @@ FROM
   , target_country_id
   , YEAR(event_date) as year
   , AVG(goldstein) as goldstein_avg
+  , SUM(goldstein) as goldstein_sum
+  , SUM(CASE
+          WHEN goldstein >= 0 THEN 1
+          WHEN goldstein <  0 THEN 0
+        END) as goldstein_pos_count
+  , SUM(CASE
+          WHEN goldstein <  0 THEN 1
+          WHEN goldstein >= 0 THEN 0
+        END) as goldstein_neg_count
 FROM
   my_tables.anh_dis_to_gov
 WHERE source_country_id = target_country_id # Dis and gov same country
@@ -45,6 +54,15 @@ FROM
   , target_country_id
   , YEAR(event_date) as year
   , AVG(goldstein) as goldstein_avg
+  , SUM(goldstein) as goldstein_sum
+  , SUM(CASE
+          WHEN goldstein >= 0 THEN 1
+          WHEN goldstein <  0 THEN 0
+        END) as goldstein_pos_count
+  , SUM(CASE
+          WHEN goldstein <  0 THEN 1
+          WHEN goldstein >= 0 THEN 0
+        END) as goldstein_neg_count
 FROM
   my_tables.anh_dis_to_gov
 WHERE source_country_id = target_country_id # Dis and gov same country
