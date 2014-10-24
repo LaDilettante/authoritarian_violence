@@ -4,9 +4,6 @@ SELECT i.*
   , cInfo.Name AS country_name
   , cInfo.ISOA3Code AS country_ISOA3Code
   , cInfo.COWCode AS country_COWCode
-  , cdd.wdicode AS country_wdicode
-  , cdd.dpicode AS country_dpicode
-  , cdd.democracy AS country_democracy
 FROM
 	(SELECT country_id
 	  , YEAR(event_date) as year
@@ -37,7 +34,4 @@ FROM
 	GROUP BY YEAR(event_date), country_id) AS i # Aggregate that by country and year
 JOIN event_data.countries AS cInfo
   ON i.country_id = cInfo.id
-JOIN my_tables.anh_dd_revisited AS cdd
-  ON cInfo.COWCode = cdd.cowcode AND
-     i.year = YEAR(cdd.year)
 );
