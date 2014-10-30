@@ -17,4 +17,5 @@ f_extract_stata_label <- function(df) {
   for (i in seq_along(names(df))) {
     lab_env[[names(df)[i]]] <- attr(df, "var.labels")[i]  
   }
+  return(lab_env)
 }
