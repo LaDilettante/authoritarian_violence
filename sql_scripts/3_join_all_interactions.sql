@@ -2,11 +2,7 @@ DROP TABLE IF EXISTS my_tables.anh_dis_and_gov;
 CREATE TABLE IF NOT EXISTS my_tables.anh_dis_and_gov AS
   SELECT * FROM my_tables.anh_dis_to_gov
   UNION
-  SELECT * FROM my_tables.anh_gov_to_dis
-  UNION
-  SELECT * FROM my_tables.anh_dis_to_dis
-  UNION
-  SELECT * FROM my_tables.anh_gov_to_gov;
+  SELECT * FROM my_tables.anh_gov_to_dis;
 
 ALTER TABLE my_tables.anh_dis_and_gov
   ADD INDEX (event_id),
