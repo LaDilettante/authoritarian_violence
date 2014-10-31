@@ -95,4 +95,4 @@ d_exp_before_trans_full <- Reduce(function(...) merge(..., match=c("iso3c", "yea
 
 # ---- Save cleaned data ----
 save(d_disgov_merged_full, d_disgovsect_merged_full, d_exp_before_trans_full,
-     file='./data/private/data_final.RData')
+     file='./data/private/actorsectlevel.RData')
