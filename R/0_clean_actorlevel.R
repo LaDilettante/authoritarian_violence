@@ -54,7 +54,7 @@ d_wdi <- d_wdi_raw %>%
 
 # ---- Load Geddes autocracy type data ----
 # emil, royal, otherwise civilian
-d_geddes_raw <- read.table("./data/public/GWF Autocratic Regimes 1.2/GWF_AllPoliticalRegimes.txt", 
+d_geddes_raw <- read.table("./data/public/GWF_Autocratic_Regimes_1_2/GWF_AllPoliticalRegimes.txt", 
                            header=TRUE, sep="\t")
 d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
@@ -96,3 +96,4 @@ d_exp_before_trans_full <- Reduce(function(...) merge(..., match=c("iso3c", "yea
 # ---- Save cleaned data ----
 save(d_disgov_merged_full, d_disgovsect_merged_full, d_exp_before_trans_full,
      file='./data/private/actorsectlevel.RData')
+

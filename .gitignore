@@ -2,6 +2,9 @@ data/private/*
 writeups/*.pdf
 *.sublime-workspace
 
+## Mac's attribute file
+.DS_Store
+
 *.Rproj.user
 *.Rproj
 *.Rhistory
