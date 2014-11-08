@@ -9,6 +9,7 @@ writeups/*.pdf
 *.Rproj
 *.Rhistory
 .Rproj.user
+.RData
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

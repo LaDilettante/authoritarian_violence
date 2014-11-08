@@ -35,11 +35,11 @@ d_wdi <- d_wdi_raw %>%
   arrange(iso3c, year)
 
 # Geddes data: authoritarian type (1946 - 2010)
-d_geddes_raw <- read.table("./data/public/GWF Autocratic Regimes 1.2/GWF_AllPoliticalRegimes.txt", 
+d_geddes_raw <- read.table("./data/public/GWF_Autocratic_Regimes_1_2/GWF_AllPoliticalRegimes.txt", 
                            header=TRUE, sep="\t")
 d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
-  select(iso3c, year, country=gwf_country, 
+  select(iso3c, year,
          gwf_military, gwf_personal, gwf_party, gwf_monarchy)
 
 # Gandhi data: fractionalization
@@ -59,10 +59,10 @@ qr_disgov = dbSendQuery(db.my_tables, "SELECT * FROM anh_dis_and_gov_aggregate_c
 d_disgov_raw = fetch(qr_disgov, n=-1)
 d_disgov <- d_disgov_raw %>%
   select(iso3c = country_ISOA3Code, year,
-         country = country_name,
          goldstein_avg, goldstein_sum, goldstein_pos_count, goldstein_neg_count)
 
 # ---- Merge data ----
+
 d_merged <- Reduce(function(...) merge(..., by=c("iso3c", "year"), sort=T),
                    list(d_disgov, d_dpi, d_wdi, d_geddes)) %>%
   mutate(country = country.x) %>%

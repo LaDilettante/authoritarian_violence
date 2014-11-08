@@ -6,7 +6,7 @@ source("./R/functions.R")
 packs <- c("lme4", "arm", "nlme", "plyr", "dplyr", "ggplot2")
 f_install_and_load(packs)
 # Load data
-load('./data/private/data_final.RData')
+load('./data/private/actorsectlevel.RData')
 
 # Rescale data
 vars <- c("liec", "legis_multi", "gdp", "gdppc", "milexp", 
