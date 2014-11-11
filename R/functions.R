@@ -56,11 +56,11 @@ f_is_unique <- function(df, vars=NULL) {
 }
 
 # Matching function (from the arm package)
-f_matching <- function (z, score, replace = FALSE) 
+f_matching_arm <- function (z, score, replace = FALSE) 
 {
   if (replace) {
-    nt <- sum(z)
-    nc <- length(z) - nt
+    nt <- sum(z) # Number of treated units
+    nc <- length(z) - nt # Number of controlled units
     cnts <- rep(0, nc)
     scorec <- score[z == 0]
     scoret <- score[z == 1]
@@ -69,6 +69,7 @@ f_matching <- function (z, score, replace = FALSE)
     ind.mt <- matrix(0, nc, nt)
     ind.t <- (1:(nt + nc))[z == 1]
     for (j in 1:nt) {
+      # near is the index (among the controls 1:nc) of the nearest control
       near <- (1:nc)[abs(scoret[j] - scorec) == min(abs(scoret[j] - 
                                                           scorec))]
       if (length(near) == 1) {
@@ -80,6 +81,8 @@ f_matching <- function (z, score, replace = FALSE)
                                   replace = F)]
         indc <- c(indc, nearest[j])
       }
+      # nearest is a vector of length = # treated, showing the index of the nearest control
+      # cnts is a vector of length = # control, each element is how many treated unit being matched to that control
       cnts[nearest[j]] <- cnts[nearest[j]] + 1
       ind.mt[nearest[j], cnts[nearest[j]]] <- ind.t[j]
     }
@@ -108,4 +111,27 @@ f_matching <- function (z, score, replace = FALSE)
     out <- cbind.data.frame(matched = matched, pairs = pairs)
   }
   return(out)
+}
+
+# My matching function
+f_matching <- function(z, score, replace=FALSE) {
+  if (replace) {
+    n <- length(score)
+    nc <- sum(z == 0)
+    nt <- sum(z == 1)
+    matched <- rep(0, n)
+    scorec <- score[z == 0]
+    scoret <- score[z == 1]
+    for (i in (1:nt)) {
+      near <- (1:nc)[abs(scoret[i] - scorec) == min(abs(scoret[i] - scorec))]
+      if (length(near) == 1) {
+        nearest[j] <- near
+        indc <- c(indc, near)
+      } else {
+        nearest[j] <- near[sample(1:length(near), 1, 
+                                  replace = F)]
+        indc <- c(indc, nearest[j])
+      }
+    }
+  }
 }

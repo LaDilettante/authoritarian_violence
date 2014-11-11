@@ -9,7 +9,10 @@ f_install_and_load(packs) ; rm(packs)
 
 # Polity IV data: other.democracies ( .. - 2012)
 d_polity_raw <- PolityGet(vars="polity2")
-d_polity <- d_polity_raw %>% mutate(polity2_binary = ifelse(polity2 > 0, 1, 0))
+d_polity <- d_polity_raw %>% 
+  mutate(polity2_binary = ifelse(polity2 > 0, 1, 0),
+         iso3c = countrycode(iso2c, origin="iso2c", destination="iso3c", warn=T)) %>%
+  select(iso3c, year, polity2, polity2_binary)
 d_other_dem <- ddply(d_polity, .(year), summarize, other.democracies = mean(polity2_binary, na.rm=T))
 
 # DPI data: liec, liec7 (1975 - 2012)
@@ -39,8 +42,8 @@ d_geddes_raw <- read.table("./data/public/GWF_Autocratic_Regimes_1_2/GWF_AllPoli
                            header=TRUE, sep="\t")
 d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
-  select(iso3c, year,
-         gwf_military, gwf_personal, gwf_party, gwf_monarchy)
+  select(iso3c, year, gwf_military, gwf_personal, gwf_party, gwf_monarchy,
+         gwf_duration)
 
 # Gandhi data: fractionalization
 d_gandhi_raw <- read.csv("./data/private/Pol_Inst_Dictatorship_Data.csv")
@@ -64,7 +67,7 @@ d_disgov <- d_disgov_raw %>%
 # ---- Merge data ----
 
 d_merged <- Reduce(function(...) merge(..., by=c("iso3c", "year"), sort=T),
-                   list(d_disgov, d_dpi, d_wdi, d_geddes)) %>%
+                   list(d_disgov, d_dpi, d_wdi, d_geddes, d_polity)) %>%
   mutate(country = country.x) %>%
   arrange(iso3c, country, year)
 d_merged <- d_merged[ , setdiff(names(d_merged), c("country.x", "country.y"))] # Remove extra columns
