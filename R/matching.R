@@ -35,11 +35,11 @@ d_wide <- d_wide[ , as.logical(1 - grepl("(land|ethnic.polarization|gwf_duration
 # d_wide <- select(d_wide, -goldstein_avg_growth.0)
 
 # Select the pretreatment country years
-d_legislature_transition <- f_find_transition_point(filter(d_countrylevel, polity2_binary==0), varname="liec7",
+d_legislature_transition <- f_find_transition_point(filter(d_countrylevel, gwf_autocracy==1), varname="liec7",
                                                     keep=c("country", "year"))
 d_pretreatment <- merge(d_wide, d_legislature_transition, 
-                        by.x=c("country", "after.year"), by.y=c("country", "year"))
-
+                        by.x=c("country", "after.year"), by.y=c("country", "year"), all.y=T)
+d_tmp <- merge(d_long, d_legislature_transition, by=c("country", "year"))
 # d_pretreatment too small?
 # d_legislature_transition <- mutate(d_legislature_transition, year.before=year-1)
 # tmp <- merge(d_countrylevel, d_legislature_transition, by.x=c("country", "year"), by.y=c("country", "year.before"), all.y=T)

@@ -7,3 +7,4 @@ GWF_Autocratic_Regimes_1_2: GWF-Autocratic-Regimes-1.2.zip
 	unzip GWF-Autocratic-Regimes-1.2.zip
 	mv GWF\ Autocratic\ Regimes\ 1.2 GWF_Autocratic_Regimes_1_2
 	find ./GWF_Autocratic_Regimes_1_2 -exec touch {} \;
+	rm GWF-Autocratic-Regimes-1.2.zip

@@ -184,8 +184,8 @@ f_turn_country_into_panel <- function(df, t=5, idvar="country", timevar="year", 
 }
 
 # Pad data so that all country years are present
-f_pad_countryyear <- function(df) {
-  years <- seq(min(df$year), max(df$year))
-  return(data.frame(country=rep(unique(df$country), length(years)),
+f_pad_countryyear <- function(df, idvar="country", timevar="year") {
+  years <- seq(min(df[ , timevar]), max(df[ , timevar]))
+  return(data.frame(country=rep(unique(df[ , idvar]), length(years)),
                     year=years))
 }

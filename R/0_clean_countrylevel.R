@@ -12,7 +12,8 @@ d_polity_raw <- PolityGet(vars="polity2")
 d_polity <- d_polity_raw %>% 
   mutate(polity2_binary = ifelse(polity2 > 0, 1, 0),
          iso3c = countrycode(iso2c, origin="iso2c", destination="iso3c", warn=T)) %>%
-  select(iso3c, year, polity2, polity2_binary)
+  select(iso3c, year, polity2, polity2_binary) %>%
+  filter(year >= 1991)
 d_other_dem <- ddply(d_polity, .(year), summarize, other.democracies = mean(polity2_binary, na.rm=T))
 
 # DPI data: liec, liec7 (1975 - 2012)
@@ -21,7 +22,8 @@ d_dpi <- d_dpi_raw  %>%
   mutate(liec = ifelse(liec==-999.0, NA, liec)) %>%
   mutate(liec7 = ifelse(liec >= 7, 1, 0)) %>%
   mutate(iso3c = countrycode(iso2c, origin="iso2c", destination="iso3c", warn=T)) %>%
-  select(-liec)
+  select(-liec) %>%
+  filter(year >= 1991)
 d_dpi <- unique(d_dpi)
 
 # WDI data: gdp, gdppc, resourcerent.pc, milexp.pc, land, population
@@ -35,7 +37,8 @@ d_wdi <- d_wdi_raw %>%
          resource.pc=NY.GDP.TOTL.RT.ZS, land=AG.LND.TOTL.K2, population=SP.POP.TOTL,
          gdp=NY.GDP.MKTP.KD, gdppc=NY.GDP.PCAP.PP.KD,
          milexp.pc, region) %>%
-  arrange(iso3c, year)
+  arrange(iso3c, year) %>%
+  filter(year >= 1991)
 
 # Geddes data: authoritarian type (1946 - 2010)
 d_geddes_raw <- read.table("./data/public/GWF_Autocratic_Regimes_1_2/GWF_AllPoliticalRegimes.txt", 
@@ -44,7 +47,8 @@ d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
   mutate(gwf_autocracy = ifelse(is.na(gwf_nonautocracy), 1, 0)) %>%
   select(iso3c, year, gwf_military, gwf_personal, gwf_party, gwf_monarchy,
-         gwf_duration, gwf_autocracy)
+         gwf_duration, gwf_autocracy) %>%
+  filter(year >= 1991)
 
 # Gandhi data: fractionalization
 d_gandhi_raw <- read.csv("./data/private/Pol_Inst_Dictatorship_Data.csv")
@@ -65,9 +69,14 @@ d_disgov <- d_disgov_raw %>%
   select(iso3c = country_ISOA3Code, year,
          goldstein_avg, goldstein_sum, goldstein_pos_count, goldstein_neg_count)
 
+# Pad the violence data to have all years
+d_disgov_pad <- ddply(d_disgov, .(iso3c), f_pad_countryyear, 
+                      idvar="iso3c", timevar="year", .inform=T)
+d_disgov <- merge(d_disgov, d_disgov_pad, by=c("iso3c", "year"), all=T)
+
 # ---- Merge data ----
 
-d_merged <- Reduce(function(...) merge(..., by=c("iso3c", "year"), sort=T),
+d_merged <- Reduce(function(...) merge(..., by=c("iso3c", "year"), sort=T, all=T),
                    list(d_disgov, d_dpi, d_wdi, d_geddes, d_polity)) %>%
   mutate(country = country.x) %>%
   arrange(iso3c, country, year)
