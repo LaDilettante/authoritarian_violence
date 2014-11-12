@@ -42,8 +42,9 @@ d_geddes_raw <- read.table("./data/public/GWF_Autocratic_Regimes_1_2/GWF_AllPoli
                            header=TRUE, sep="\t")
 d_geddes <- d_geddes_raw %>%
   mutate(iso3c = countrycode(cowcode, "cown", "iso3c")) %>%
+  mutate(gwf_autocracy = ifelse(is.na(gwf_nonautocracy), 1, 0)) %>%
   select(iso3c, year, gwf_military, gwf_personal, gwf_party, gwf_monarchy,
-         gwf_duration)
+         gwf_duration, gwf_autocracy)
 
 # Gandhi data: fractionalization
 d_gandhi_raw <- read.csv("./data/private/Pol_Inst_Dictatorship_Data.csv")
@@ -77,6 +78,11 @@ d_merged <- merge(d_merged, d_other_dem, by=c("year"))
 d_merged <- merge(d_merged, d_ethnic, by=c("iso3c"))
 
 d_countrylevel <- d_merged[order(d_merged$iso3c, d_merged$year), ]
+
+# ---- Transformation ----
+d_countrylevel <- d_countrylevel %>% 
+  mutate(lgdppc = log(gdppc)) %>% select(-gdppc) %>%
+  mutate(lgdp = log(gdp)) %>% select(-gdp)
 
 # ---- Save to disk ----
 save(d_countrylevel, file="./data/private/countrylevel.RData")

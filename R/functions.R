@@ -135,3 +135,57 @@ f_matching <- function(z, score, replace=FALSE) {
     }
   }
 }
+
+# Find transition point
+f_find_transition_point <- function(df, varname="democracy", keep=NULL) {
+  df <- df[!is.na(df[ , varname]), ]
+  
+  wanted_rows <- data.table:::uniqlist(df[ , varname, drop=FALSE])[-1] # -1 to get rid of the first row
+  
+  df_transition <- data.frame(df[wanted_rows, ],
+                              previous_value=df[wanted_rows - 1, varname])
+  df_transition_into_treatment <- df_transition[df_transition[ , varname]==1, ]
+  if (!is.null(keep)) {
+    return(df_transition_into_treatment[ , keep])
+  } else {
+    return(df_transition_into_treatment)  
+  } 
+}
+
+# Find never treated countries
+f_find_never_treated <- function(df, varname="liec7") {
+  if (max(unique(df[ , varname]), na.rm=T) == 0) {
+    return(df)
+  }
+}
+
+# Create short panel
+f_turn_country_into_panel <- function(df, t=5, idvar="country", timevar="year", drop=NULL) {
+  n <- length(unique(df$year))
+  if (n >= t) {
+    # Create moving windows of length t. First window starts at 1, last window starts at n - t + 1
+    idx <- lapply(1:(n-t+1), FUN=`+`, 0:(t-1))
+    # Create a list of short panels
+    short_panels <- lapply(idx, function(i) data.frame(df[i, setdiff(names(df), "year")], year=0:(t-1)))
+    # Add first difference to each short_panel
+    # short_panels <- lapply(short_panels, function(df)
+    #  mutate(df, goldstein_avg_growth=c(NA, diff(goldstein_avg) / goldstein_avg[-length(goldstein_avg)] * 100)))
+    # Name that list
+    names(short_panels) <- df$year[1:(n-t+1)]
+    # Convert each short panel in the list from long to wide
+    widened_short_panels <- lapply(short_panels, reshape, 
+                                   idvar=idvar, timevar=timevar, drop=drop, direction="wide")
+    # rbind and returns those widened panels
+    res <- do.call(rbind, args=widened_short_panels)
+    res <- data.frame(start.year = as.numeric(rownames(res)), 
+                      after.year = as.numeric(rownames(res)) + t, res)
+    return(res)  
+  }
+}
+
+# Pad data so that all country years are present
+f_pad_countryyear <- function(df) {
+  years <- seq(min(df$year), max(df$year))
+  return(data.frame(country=rep(unique(df$country), length(years)),
+                    year=years))
+}
