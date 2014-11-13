@@ -55,7 +55,6 @@ d_control <- ddply(d_wide, .(country), f_find_never_treated, treatmentvar=c_trea
 
 # ---- Model propensity (with cross validation) ----
 d_control_and_pretreatment <- na.omit(rbind.data.frame(d_control, d_pretreatment))
-d_wide <- na.omit(d_wide)
 
 set.seed(1603)
 train_control <- sample(which(d_control_and_pretreatment[ , c_treatmentvar] == 0), nrow(na.omit(d_control)) * c_trainratio)
@@ -83,32 +82,30 @@ predicted.fit <- ifelse(pscore_fit >= 0.5, 1, 0)
 table(predicted.fit, real.fit=d_control_and_pretreatment[, c_treatmentvar])
 
 
-matches <- matching(z=m_psfit$y, score=pscore_fit, replace=TRUE)
-d_wide_matched <- d_wide[matches$matched, ]
-pscore_fit_matched <- pscore_fit[matches$matched]
-
 # ---- Match with other countries ----
 
-# pscore_fit 1102 score
-# d_wide 1102 row
+d_to_be_matched <- cbind.data.frame(d_control_and_pretreatment[, c("country", "start.year", c_treatmentvar)], pscore=pscore_fit)
 
-d_to_be_matched <- cbind.data.frame(d_wide[, c("country", "start.year", c_treatmentvar)], pscore_fit)
-
-f_match_with_other_countries <- function(df, countryname, year) {
-  df_countryyear <- filter(df, country == countryname, start.year == year)
-  df_other <- filter(df, country != countryname)
-  near_idx <- which(abs(df_countryyear$pscore - df_other$pscore) == min(abs(df_countryyear$pscore - df_other$pscore)))
-  if (length(near_idx)==1) {
-    nearest_idx <- near_idx
-  } else {
-    nearest_idx <- sample(near_idx, size=1, replace=F)
+f_match_with_control <- function(row, df) {
+  # Check first if that country year is a pretreatment case
+  if (row[ , c_treatmentvar] == 1) {
+    df_control <- df[df[ , c_treatmentvar]==0, ]
+    near_idx <- which(abs(row$pscore - df_control$pscore) == min(abs(row$pscore - df_control$pscore)))
+    if (length(near_idx)==1) {
+      nearest_idx <- near_idx
+    } else {
+      nearest_idx <- sample(near_idx, size=1, replace=F)
+    }
+    out <- data.frame(country.match = df_control[nearest_idx, "country"], 
+                      year.match = df_control[nearest_idx, "start.year"],
+                      pscore.match = df_control[nearest_idx, "pscore"])
+    return(out) 
   }
-  out <- data.frame(country.treat = df_countryyear$country, year.treat = df_countryyear$start.year,
-                    country.match = df_other[nearest_idx, "country"], year.match = df_other[nearest_idx, "start.year"])
-  return(out)
 }
 
-f_match_with_other_countries(d_to_be_matched, countryname="Albania", year=1994)
+f_match_with_
+
+match_res <- adply(d_to_be_matched, 1, f_match_with_other_countries, df=d_to_be_matched)
 
 # Show the matches
 matches$original <- 1:length(matches$matched)
