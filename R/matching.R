@@ -8,8 +8,12 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("gridExtra", "arm", "plyr", "dplyr", "ggplot2")
+packs <- c("gridExtra", "boot", "arm", "plyr", "dplyr", "ggplot2")
 f_install_and_load(packs) ; rm(packs)
+
+# ---- Some constant ----
+c_treatmentvar <- "liec6"
+c_trainratio <- 0.5
 
 # Load data
 load('./data/private/countrylevel.RData')
@@ -18,61 +22,65 @@ load('./data/private/countrylevel.RData')
 d_long <- d_countrylevel %>%
   filter(gwf_autocracy == 1) %>%
   select(country, year, goldstein_avg, resource.pc,
-         lgdppc, lgdp, land, population, milexp.pc,
+         lgdppc, lgdp,
          gwf_military, gwf_party, gwf_monarchy, gwf_duration,
          ethnic.polarization)
 
-# Pad data so that all country year are present
-d_long_pad <- ddply(d_long, .(country), f_pad_countryyear)
-d_long <- merge(d_long, d_long_pad, by=c("country", "year"), all=T)
+# Pad data so that all country year are present. Not a good idea cuz some countries dip in and out of democracy...
+# d_long_pad <- ddply(d_long, .(country), f_pad_countryyear)
+# d_long <- merge(d_long, d_long_pad, by=c("country", "year"), all=T)
 
 # Transform d_long to d_wide of short panels
 d_wide <- ddply(d_long, .(country),
-             f_turn_country_into_panel, t=2, idvar="country", timevar="year", .inform=TRUE)
-d_wide <- merge(d_wide, d_countrylevel[ , c("country", "year", "liec7")], 
+             f_turn_country_into_panel, t=1, idvar="country", timevar="year", .inform=TRUE)
+d_wide <- merge(d_wide, d_countrylevel[ , c("country", "year", c_treatmentvar)], 
                      by.x=c("country", "after.year"), by.y=c("country", "year"), all.x=T)
-d_wide <- d_wide[ , as.logical(1 - grepl("(land|ethnic.polarization|gwf_duration).[1-4]", names(d_wide)))]
+d_wide <- d_wide[ , as.logical(1 - grepl("(land|ethnic.polarization|gwf_duration|gwf_military|gwf_party|gwf_monarchy).[1-4]", names(d_wide)))]
 # d_wide <- select(d_wide, -goldstein_avg_growth.0)
 
 # Select the pretreatment country years
-d_legislature_transition <- f_find_transition_point(filter(d_countrylevel, gwf_autocracy==1), varname="liec7",
-                                                    keep=c("country", "year"))
+d_legislature_transition <- f_find_transition_point(d_countrylevel, varname=c_treatmentvar, keep=c("country", "year", "gwf_autocracy")) %>%
+                              filter(gwf_autocracy==1) %>% select(-gwf_autocracy)
 d_pretreatment <- merge(d_wide, d_legislature_transition, 
-                        by.x=c("country", "after.year"), by.y=c("country", "year"), all.y=T)
-d_tmp <- merge(d_long, d_legislature_transition, by=c("country", "year"))
-# d_pretreatment too small?
-# d_legislature_transition <- mutate(d_legislature_transition, year.before=year-1)
-# tmp <- merge(d_countrylevel, d_legislature_transition, by.x=c("country", "year"), by.y=c("country", "year.before"), all.y=T)
+                        by.x=c("country", "after.year"), by.y=c("country", "year"))
+
+# Look at the lost cases. Russian 1994 is interesting (Russia 1993 is democratic according to Geddes). Liberia did have election in 1997, but no
+# idea why its liec = 1 (no legislature). The rest is too early. The earliest we can do is 1993
+# anti_join(d_legislature_transition, d_wide, by=c("country"="country", "year"="after.year"))
+
+# So we had 42 legislature transition. (t=2) Down to 36 cases in pretreatment (as above). Down to 18 cases due to missing covariates in pretreatment
 
 # Select the control (never treated) country years
-d_control <- ddply(d_wide, .(country), f_find_never_treated)
+d_control <- ddply(d_wide, .(country), f_find_never_treated, treatmentvar=c_treatmentvar)
 
 # ---- Model propensity (with cross validation) ----
 d_control_and_pretreatment <- na.omit(rbind.data.frame(d_control, d_pretreatment))
 d_wide <- na.omit(d_wide)
 
-set.seed(100)
-train <- sample(1:nrow(d_control_and_pretreatment), nrow(d_control_and_pretreatment) / 2)
+set.seed(1603)
+train_control <- sample(which(d_control_and_pretreatment[ , c_treatmentvar] == 0), nrow(na.omit(d_control)) * c_trainratio)
+train_pretreatment <- sample(which(d_control_and_pretreatment[ , c_treatmentvar] == 1), nrow(na.omit(d_pretreatment)) * c_trainratio)
+train <- c(train_control, train_pretreatment)
 
-m_pstrain <- glm(liec7 ~ .,
+m_pstrain <- glm(as.formula(paste(c_treatmentvar, "~ .")),
                data=select(d_control_and_pretreatment[train, ], -country, -start.year, -after.year), 
                family=binomial(link="logit"))
 summary(m_pstrain)
 
 # Calculate propensity score and check predictive fit
 pscore_train <- predict(m_pstrain, newdata=d_control_and_pretreatment[-train, ], type="response")
-predicted.liec7 <- ifelse(pscore_train >= 0.5, 1, 0)
-table(predicted.liec7, real.liec7=d_control_and_pretreatment[-train, "liec7"])
+predicted <- ifelse(pscore_train >= 0.5, 1, 0)
+table(predicted, real=d_control_and_pretreatment[-train, c_treatmentvar])
 
 # ---- Model propensity (whole sample) ----
 
-m_psfit <- glm(liec7 ~ .,
+m_psfit <- glm(as.formula(paste(c_treatmentvar, "~ .")),
                  data=select(d_control_and_pretreatment, -country, -start.year, -after.year), 
                  family=binomial(link="logit"))
 summary(m_psfit)
 pscore_fit <- predict(m_psfit, type="response")
-predicted.liec7.fit <- ifelse(pscore_fit >= 0.5, 1, 0)
-table(predicted.liec7.fit, real.liec7.fit=d_control_and_pretreatment[, "liec7"])
+predicted.fit <- ifelse(pscore_fit >= 0.5, 1, 0)
+table(predicted.fit, real.fit=d_control_and_pretreatment[, c_treatmentvar])
 
 
 matches <- matching(z=m_psfit$y, score=pscore_fit, replace=TRUE)
@@ -84,7 +92,7 @@ pscore_fit_matched <- pscore_fit[matches$matched]
 # pscore_fit 1102 score
 # d_wide 1102 row
 
-d_to_be_matched <- cbind.data.frame(d_wide[, c("country", "start.year", "liec7")], pscore_fit)
+d_to_be_matched <- cbind.data.frame(d_wide[, c("country", "start.year", c_treatmentvar)], pscore_fit)
 
 f_match_with_other_countries <- function(df, countryname, year) {
   df_countryyear <- filter(df, country == countryname, start.year == year)

@@ -153,9 +153,12 @@ f_find_transition_point <- function(df, varname="democracy", keep=NULL) {
 }
 
 # Find never treated countries
-f_find_never_treated <- function(df, varname="liec7") {
-  if (max(unique(df[ , varname]), na.rm=T) == 0) {
-    return(df)
+f_find_never_treated <- function(df, treatmentvar="liec7") {
+  treatment <- df[ , treatmentvar]
+  if (!all(is.na(treatment))) {
+    if (max(unique(treatment), na.rm=T) == 0) {
+      return(df)
+    }  
   }
 }
 
@@ -186,6 +189,7 @@ f_turn_country_into_panel <- function(df, t=5, idvar="country", timevar="year", 
 # Pad data so that all country years are present
 f_pad_countryyear <- function(df, idvar="country", timevar="year") {
   years <- seq(min(df[ , timevar]), max(df[ , timevar]))
-  return(data.frame(country=rep(unique(df[ , idvar]), length(years)),
-                    year=years))
+  res <- data.frame(rep(unique(df[ , idvar]), length(years)), years)
+  colnames(res) <- c(idvar, timevar)
+  return(res)
 }
