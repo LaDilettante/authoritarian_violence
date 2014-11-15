@@ -3,7 +3,7 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("WDI", "psData", "foreign", "RMySQL", "data.table", "plyr", "dplyr", "countrycode", "foreign")
+packs <- c("WDI", "psData", "foreign", "RMySQL", "data.table", "plyr", "dplyr", "countrycode")
 f_install_and_load(packs)
 
 # ---- Load event data ----

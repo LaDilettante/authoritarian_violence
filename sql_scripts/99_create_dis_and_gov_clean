@@ -1,0 +1,42 @@
+DROP TABLE IF EXISTS my_tables.anh_dis_and_gov_clean;
+CREATE TABLE IF NOT EXISTS my_tables.anh_dis_and_gov_clean AS (
+SELECT i.*
+  , cInfo.ISOA3Code AS country_iso3c
+  , cInfo.Name AS country
+  , dInfo.name AS dissident_actor_name
+FROM
+	((SELECT event_id
+	  , event_date
+      , YEAR(event_date) as year
+	  , goldstein
+	  , source_country_id AS country_id
+	  , target_actor_id AS dissident_actor_id
+	  , target_sector_id AS dissident_sector_id
+      , target_sector_name AS dissident_sector_name
+	  , 1 AS gov_initiates
+	FROM my_tables.anh_gov_to_dis 
+	WHERE source_country_id = target_country_id)
+	UNION
+	(SELECT event_id
+	  , event_date
+	  , YEAR(event_date) as year
+	  , goldstein
+	  , target_country_id AS country_id
+	  , source_actor_id AS dissident_actor_id
+	  , source_sector_id AS dissident_sector_id
+      , source_sector_name AS dissident_sector_name
+	  , 0 AS gov_initiates
+	FROM my_tables.anh_dis_to_gov 
+	WHERE source_country_id = target_country_id)) AS i
+JOIN event_data.countries AS cInfo
+  ON i.country_id = cInfo.id
+JOIN event_data.dict_actors AS dInfo
+  ON i.dissident_actor_id = dInfo.actor_id
+);
+
+ALTER TABLE my_tables.anh_dis_and_gov_clean
+ADD INDEX (event_id),
+ADD INDEX (dissident_actor_id),
+ADD INDEX (dissident_sector_id),
+ADD INDEX (country_id),
+ADD INDEX (event_date);

@@ -1,4 +1,10 @@
-library(R2jags)
+# ---- Set up workspace ----
+rm(list=ls())
+# Load external functions
+source("./R/functions.R")
+# Load packages
+packs <- c("R2jags", "plyr", "dplyr", "countrycode")
+f_install_and_load(packs)
 
 # Set up JAGS model
 # JAGS needs a list of names that contain the data

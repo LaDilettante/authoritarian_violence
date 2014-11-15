@@ -1,7 +1,7 @@
 # ---- Set up workspace ----
 rm(list=ls())
 source("./R/functions.R")
-packs <- c("WDI", "psData", "foreign", "countrycode", "RMySQL", "sem", "plyr", "dplyr", "plm")
+packs <- c("WDI", "psData", "foreign", "countrycode", "RMySQL", "sem", "plyr", "dplyr")
 f_install_and_load(packs) ; rm(packs)
 
 # ---- Some constants ----

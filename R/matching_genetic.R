@@ -28,7 +28,7 @@ d_long <- d_countrylevel %>%
          land, population, gwf_military, gwf_party, gwf_monarchy, gwf_duration, ethnic.polarization, 
          match(c_treatmentvar, names(d_countrylevel)))
 
-# ---- Select universe of match-able cases
+# ---- Select universe of match-able cases ----
 
 d_wide <- ddply(d_long, .(country), f_turn_country_into_panel, 
                 t=c_panel_length, idvar="country", timevar="year")
@@ -45,7 +45,7 @@ treatRows <- apply(d_wide[, paste0(c_treatmentvar, ".", 0:c_posttreat_length)], 
 d_control_panel <- d_wide[controlRows, ]
 d_treat_panel <- d_wide[treatRows, ]
 
-# ---- Create the data frame to be matched, which is the first year in the panel
+# ---- Create the data frame to be matched, which is the first year in the panel ----
 d_control_and_pretreat <- rbind.data.frame(d_control_panel, d_treat_panel)
 # regex: not start with "liec", followed by any character one or more time, end with 0
 firstyear_vars_idx <- grep("^(?!liec).+0$", names(d_control_and_pretreat), perl=T)
@@ -70,7 +70,6 @@ balance_vars <- paste(c(names(BalanceMatrix)[1], paste("+", names(BalanceMatrix)
 fm_gen1 <- as.formula(paste(paste0(c_treatmentvar, ".", c_pretreat_length), "~", balance_vars))
 MatchBalance(fm_gen1, data=cbind.data.frame(liec6.1=Tr, BalanceMatrix), match.out=mgen1, nboots=1000)
 
-names(mgen1)
 par(mfrow=c(1, 2))
 with(d_to_be_matched, 
      qqplot(goldstein_avg.0[mgen1$index.control], goldstein_avg.0[mgen1$index.treated]))
@@ -80,6 +79,23 @@ with(d_to_be_matched,
 abline(coef=c(0, 1), col=2)
 par(mfrow=c(1, 1))
 
-cbind.data.frame(d_to_be_matched[mgen1$index.treated, c("country", "start.year")], 
-                 d_to_be_matched[mgen1$index.control, c("country", "start.year")])
+# List of the match
+d_matched_pairs <- cbind.data.frame(d_to_be_matched[mgen1$index.treated, c("country", "start.year")], 
+                              d_to_be_matched[mgen1$index.control, c("country", "start.year")])
 # FORGOT CANT match with itself!
+
+# ---- Extract the matched sample ready for analysis ----
+nrow(d_to_be_matched)
+
+d_matched_firstyear <- rbind.data.frame(d_to_be_matched[mgen1$index.treated, c("country", "start.year")], 
+                                        d_to_be_matched[mgen1$index.control, c("country", "start.year")])
+
+f_expand <- function(row, num_expand=c_panel_length) {
+  data.frame(country=rep(row$country, num_expand),
+             year=row$start.year + 0:(num_expand-1))
+}
+d_matched_allyears <- adply(d_matched_firstyear, 1, f_expand, num_expand=c_panel_length, .inform=T)
+d_matched_panel <- merge(d_matched_panel, d_long, by=c("country", "year"))
+
+# ---- Save the matched data ----
+save(d_matched_panel, d_matched_pairs, file="./data/private/matched_panel.RData")
