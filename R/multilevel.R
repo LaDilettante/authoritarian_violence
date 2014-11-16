@@ -6,6 +6,9 @@ source("./R/functions.R")
 packs <- c("R2jags", "plyr", "dplyr", "countrycode")
 f_install_and_load(packs)
 
+# ---- Load data ----
+load("./data/private/actorsectlevel.RData")
+
 # Set up JAGS model
 # JAGS needs a list of names that contain the data
 reg.data = list("y", "countryyear", "T", "z")
