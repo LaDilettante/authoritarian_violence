@@ -36,13 +36,12 @@ reg.model <- function() {
   for (i in 1:N){
     y[i] ~ dnorm(a[actor[i]], sigma.y)
   }
-  for (j in 1:J) {
-    a[j] ~ dnorm(b[countryyear[j]], sigma.a)
+  for (i in 1:J) {
+    aT[j,] ~ dmnorm(aT.hat[j, ], Tau.aT[,])
+    aT.hat[j, 1] <- g0 + g1 * T[j]
+    aT.hat[j, 2] <- m0 + m1 * z[j] 
   }
-  for (k in 1:K) {
-    b[k] ~ dnorm(g1 * T[j] + g2 * milexp.pc[j], sigma.b)
-  }
-  
+
   # Priors
   sigma.y <- 1 / phi.y
   phi.y   ~ dgamma(1,1)
@@ -55,7 +54,7 @@ reg.model <- function() {
   rho.aT ~ dunif(-1,1)
   Sigma.aT[1, 2] <- rho.aT * sigma.a * sigma.T
   Sigma.aT[2, 1] <- Sigma.at[1, 2]
-  
+
   g0 ~ dnorm(0, .0001)
   g1 ~ dnorm(0, .0001)
   m0 ~ dnorm(0, .0001)

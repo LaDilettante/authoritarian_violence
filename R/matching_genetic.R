@@ -95,7 +95,7 @@ f_expand <- function(row, num_expand=c_panel_length) {
              year=row$start.year + 0:(num_expand-1))
 }
 d_matched_allyears <- adply(d_matched_firstyear, 1, f_expand, num_expand=c_panel_length, .inform=T)
-d_matched_panel <- merge(d_matched_panel, d_long, by=c("country", "year"))
+d_matched_panel <- merge(d_matched_allyears, d_long, by=c("country", "year"))
 
 # ---- Save the matched data ----
-save(d_matched_panel, d_matched_pairs, file="./data/private/matched_panel.RData")
+save(d_matched_panel, d_matched_pairs, d_matched_allyears, file="./data/private/matched_panel.RData")
