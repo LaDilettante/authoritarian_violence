@@ -20,13 +20,15 @@ d_disgov <- d_disgov_raw %>%
   select(event_id, goldstein,
          iso3c = country_iso3c, year, country,
          dissident_actor_name, dissident_actor_id, 
-         dissident_sector_name, dissident_sector_id)
+         dissident_sector_name, dissident_sector_id) %>%
+  distinct(event_id)
 
 # ---- Only select the matched country years ----
 load("./data/private/matched_panel.RData")
 d_matched_panel <- d_matched_panel %>%
   mutate(iso3c = countrycode(country, origin="country.name", destination="iso3c"), warn=T) %>%
-  select(iso3c, year)
+  select(iso3c, year) %>%
+  distinct()
 
 d_disgov_matched <- merge(d_disgov, d_matched_panel, by=c("iso3c", "year"))
 # Some rows can't be matched, since we balanced on the first year, sometimes the subsequent 3 years are missing
