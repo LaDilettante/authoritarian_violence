@@ -21,6 +21,8 @@ d_disgov <- d_disgov_raw %>%
          iso3c = country_iso3c, year, country,
          dissident_actor_name, dissident_actor_id, 
          dissident_sector_name, dissident_sector_id) %>%
+  mutate(dissident_sector_id = as.factor(dissident_sector_id)) %>%
+  mutate(dissident_sector_name = as.factor(dissident_sector_name)) %>%
   distinct(event_id)
 
 # ---- Only select the matched country years ----
