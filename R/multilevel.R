@@ -19,12 +19,12 @@ d_eventlevel <- na.omit(d_eventlevel)
 # ---- Set up index link ----
 d_countryyear <- unique(select(d_eventlevel,
                                countryyear, country, resource.pc, milexp.pc,
-                               liec, liec5, liec6, liec7, 
+                               liec, liec5, liec6, liec7,
                                gwf_military, gwf_party, gwf_personal, gwf_duration))
 d_country <- unique(select(d_eventlevel, 
                            country, ethnic.polarization, region))
 d_event <- unique(select(d_eventlevel,
-                         event_id, countryyear, goldstein))
+                         event_id, countryyear, goldstein, dissident_sector_name))
 
 N <- nrow(d_event)
 J <- nrow(d_countryyear)
@@ -42,24 +42,21 @@ for (k in (1:K)) {
 # ---- Set up data ----
 goldstein <- d_event$goldstein
 liec <- d_countryyear$liec6
-milexp.pc <- d_countryyear$milexp.pc
-resource.pc <- d_countryyear$resource.pc
-duration <- d_countryyear$gwf_duration
-military <- d_countryyear$gwf_military
-personal <- d_countryyear$gwf_personal
-party <- d_countryyear$gwf_party
+Xa <- with(d_countryyear, 
+           cbind.data.frame(milexp.pc, resource.pc, gwf_duration, 
+                            gwf_military, gwf_personal, gwf_party))
 ethnic <- d_country$ethnic.polarization
 
 # Set up JAGS model
 # JAGS needs a list of names that contain the data
-reg.data = list("goldstein", "liec", "milexp.pc", "resource.pc", "duration","ethnic",
-                "military", "personal", "party",
+reg.data = list("goldstein", "liec", "Xa",
+                "ethnic",
                 "countryyear.idx", "country.idx",
                 "N", "J", "K")
 
 # JAGS also needs a list of names of parameters
 reg.params = c("a", "sigma.goldstein", "phi.goldstein",
-               "b", "g.liec", "g.mil", "g.res", "g.dur", "g.military", "g.personal", "g.party", "sigma.a", "phi.a",
+               "b", "g.liec", "G", "sigma.a", "phi.a",
                "d.ethnic", "sigma.b", "phi.b")
 
 # Initial values of parameters are optional; JAGS can compute
@@ -76,20 +73,15 @@ reg.model <- function() {
   phi.goldstein ~ dgamma(1, 1)
   
   for (j in 1:J) {
-    a[j] ~ dnorm(b[country.idx[j]] + g.liec*liec[j] + g.mil*milexp.pc[j] + 
-                   g.res*resource.pc[j] + g.dur*duration[j] +
-                   g.military*military[j] + g.personal*personal[j] + g.party*party[j], 
+    a[j] ~ dnorm(b[country.idx[j]] + g.liec*liec[j] + G %*% Xa[j, ], 
                  sigma.a)
   }
   sigma.a <- 1 / phi.a
   phi.a ~ dgamma(1, 1)
   g.liec ~ dnorm(0, .0001)
-  g.mil ~ dnorm(0, .0001)
-  g.res ~ dnorm(0, .0001)
-  g.dur ~ dnorm(0, .0001)
-  g.military ~ dnorm(0, .0001)
-  g.personal ~ dnorm(0, .0001)
-  g.party ~ dnorm(0, .0001)
+  for (i in 1:6) {
+    G[i] ~ dnorm(0, .0001)
+  }
   
   for (k in 1:K) {
     b[k] ~ dnorm(d.ethnic*ethnic[k], sigma.b)
