@@ -41,21 +41,26 @@ for (k in (1:K)) {
 
 # ---- Set up data ----
 goldstein <- d_event$goldstein
-liec <- d_countryyear$liec6
+liec <- d_countryyear$liec5
 Xa <- with(d_countryyear, 
            cbind.data.frame(milexp.pc, resource.pc, gwf_duration, 
                             gwf_military, gwf_personal, gwf_party))
+dimXa <- dim(Xa)
+
+Xgoldstein <- model.matrix(~ dissident_sector_name - 1, data=d_event)[, -1]
+dimXgoldstein <- dim(Xgoldstein)
+
 ethnic <- d_country$ethnic.polarization
 
 # Set up JAGS model
 # JAGS needs a list of names that contain the data
-reg.data = list("goldstein", "liec", "Xa",
+reg.data = list("goldstein", "Xgoldstein", "dimXgoldstein",
+                "liec", "Xa", "dimXa",
                 "ethnic",
-                "countryyear.idx", "country.idx",
-                "N", "J", "K")
+                "countryyear.idx", "country.idx", "N", "J", "K")
 
 # JAGS also needs a list of names of parameters
-reg.params = c("a", "sigma.goldstein", "phi.goldstein",
+reg.params = c("a", "A", "sigma.goldstein", "phi.goldstein",
                "b", "g.liec", "G", "sigma.a", "phi.a",
                "d.ethnic", "sigma.b", "phi.b")
 
@@ -67,10 +72,14 @@ reg.params = c("a", "sigma.goldstein", "phi.goldstein",
 reg.model <- function() {
   # Model structure
   for (i in 1:N){
-    goldstein[i] ~ dnorm(a[countryyear.idx[i]], sigma.goldstein)
+    goldstein[i] ~ dnorm(a[countryyear.idx[i]] + A %*% Xgoldstein[i, ], 
+                         sigma.goldstein)
   }
   sigma.goldstein <- 1 / phi.goldstein
   phi.goldstein ~ dgamma(1, 1)
+  for (i in 1:dimXgoldstein[2]) {
+    A[i] ~ dnorm(0, .0001)
+  }
   
   for (j in 1:J) {
     a[j] ~ dnorm(b[country.idx[j]] + g.liec*liec[j] + G %*% Xa[j, ], 
@@ -79,7 +88,7 @@ reg.model <- function() {
   sigma.a <- 1 / phi.a
   phi.a ~ dgamma(1, 1)
   g.liec ~ dnorm(0, .0001)
-  for (i in 1:6) {
+  for (i in 1:dimXa[2]) {
     G[i] ~ dnorm(0, .0001)
   }
   
@@ -96,10 +105,6 @@ reg.model <- function() {
 # 2) Number of burn-in samples to discard (n.burnin)
 # 3) Number of draws to skip between valid samples aka thinning (n.thin)
 # 4) Number of chains to run (n.chains)
-#     Some statisticians suggest rerunning MCMC from different starting 
-#     values to help judge whether your MCMC has converged to the true
-#     posterior.  Each separate run of MCMC is called a chain. 
-#     For simple problems, not necessary.
 reg.fit <- jags.parallel(data=reg.data, 
                          parameters.to.save=reg.params,
                          n.chains=3,
@@ -120,5 +125,6 @@ reg.fit.mcmc = as.mcmc(reg.fit)
 
 quantile(reg.fit$BUGSoutput$sims.matrix[,"g.liec"], c(.025, .05, .5, .95, .975))
 plot(density(reg.fit$BUGSoutput$sims.matrix[,"g.liec"]))
-#HPDinterval(reg.fit.mcmc[,"g.liec"])
+mean(reg.fit$BUGSoutput$sims.matrix[,"g.liec"] >= 0)
+# HPDinterval(reg.fit.mcmc[,"g.liec"], prob=0.95)
 
