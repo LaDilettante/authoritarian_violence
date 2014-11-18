@@ -21,8 +21,8 @@ f_stata_to_env <- function(df) {
 }
 
 f_stata_to_df <- function(df) {
-  lab_df <- data.frame(var.name = names(d_tmp),
-                       var.label = attr(d_tmp, "var.labels"))
+  lab_df <- data.frame(var.name = names(df),
+                       var.label = attr(df, "var.labels"))
   return(lab_df)
 }
 
