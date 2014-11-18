@@ -193,3 +193,32 @@ f_pad_countryyear <- function(df, idvar="country", timevar="year") {
   colnames(res) <- c(idvar, timevar)
   return(res)
 }
+
+# Get level names from variables (for balance table)
+f_getlevelnames <- function(df, vars) {
+  unlist(sapply(vars, function(var) paste(var, levels(df[ , var])[-1], sep="_")))
+}
+
+# Add significance level star to table
+f_addstar <- function(df, pvaluevar="p.value") {
+  pval <- df[ , pvaluevar]
+  if (is.null(pval)) {
+    stop("Variable not found.")
+  } else {
+    stars <- ifelse(pval <= .001, "***",
+                    ifelse(pval <= .05, "**",
+                           ifelse(pval <= .1, "*", "")))
+  }
+  return(cbind.data.frame(df, stars))
+}
+
+# Create a balance table based on MatchBalance result
+f_create_balancetable <- function(df, balance_vars, bal_result) {
+  f_addstar(
+    cbind.data.frame(
+      f_getlevelnames(d_pci, balance_vars),
+      ldply(bal_result, function(x) 
+        data.frame(mean.Tr=x$mean.Tr, mean.Co=x$mean.Co, p.value=x$p.value))
+    )
+  ) 
+}

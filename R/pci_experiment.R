@@ -24,40 +24,63 @@ d_lab <- f_stata_to_df(d_pci)
 
 d_pci <- d_pci %>% 
   mutate(treat = ifelse(form=="B", 1, 0)) %>%
-  mutate(whether.north = ifelse(province %in% c_northprovinces, 1, 
-                                ifelse(province %in% c_southprovinces, 0, NA))) %>%
+  mutate(whether.north = as.factor(ifelse(province %in% c_northprovinces, 1, 
+                                ifelse(province %in% c_southprovinces, 0, NA)))) %>%
   mutate(communication = ifelse(i_4_1=="Yes", 1, ifelse(i_4_1=="No", 0, NA))) %>%
-  mutate(representation = ifelse(i_4_2=="Yes", 1, ifelse(i_4_2=="No", 0, NA)))
+  mutate(representation = ifelse(i_4_2=="Yes", 1, ifelse(i_4_2=="No", 0, NA))) %>%
+  mutate(responded.comm = ifelse(!is.na(communication), 1, 0)) %>%
+  mutate(responded.rep = ifelse(!is.na(representation), 1, 0))
+           
+
 # ---- Check balance ----
 
-MatchBalance(treat ~ a7_1 + a8_1,data = d_pci)
+c_balance_vars <- c("a4", "a5_1", "a5_2", "a5_3", "a5_4", "a5_5", "a7_1", "a8_1",
+                    "a13_1", "a13_2", "a13_3", "a14_1", "a14_2", "a14_3", "a14_4", 
+                    "a14_5", "a14_6", "whether.north")
+fm_balance <- as.formula(paste("treat ~", paste(c_balance_vars, collapse=" + ")))
 
-m_bal_comm <- MatchBalance(treat ~ a4 + a5_1 + a5_2 + a5_3 + a5_4 + a5_5 + 
-                a7_1 + a8_1, data=filter(d_pci, !is.na(communication)))$BeforeMatching
+# Balance among those responded to communication question
+m_bal_comm <- MatchBalance(fm_balance,
+                data=filter(d_pci, !is.na(communication)))$BeforeMatching
+f_create_balancetable(df=d_pci, balance_vars=c_balance_vars, bal_result=m_bal_comm)
 
-with(d_pci, levels)
-cbind.data.frame(c(levels(d_pci$a7_1)[-1], levels(d_pci$a8_1)[-1]),
-  ldply(m_bal_comm, function(x) data.frame(mean.Tr=x$mean.Tr, mean.Co=x$mean.Co,
-                                          p.value=x$p.value)))
+# Balance among those responded to the representation question
+m_bal_rep <- MatchBalance(fm_balance,
+                data=filter(d_pci, !is.na(representation)))$BeforeMatching
+f_create_balancetable(df=d_pci, balance_vars=c_balance_vars, bal_result=m_bal_rep)
 
-mean.Tr mean.Co p.value qqsummary$meandiff / mediandiff maxdiff
+# Balance between those responded and not responded
+fm_balance_rescomm <- as.formula(paste("responded.comm ~", paste(c_balance_vars, collapse=" + ")))
+fm_balance_resrep <- as.formula(paste("responded.rep ~", paste(c_balance_vars, collapse=" + ")))
+
+m_bal_rescomm <- MatchBalance(fm_balance_rescomm, data=d_pci)$BeforeMatching
+f_create_balancetable(d_pci, c_balance_vars, m_bal_rescomm)
+
+m_bal_resrep <- MatchBalance(fm_balance_resrep, data=d_pci)$BeforeMatching
+f_create_balancetable(d_pci, c_balance_vars, m_bal_resrep)
+
 # ---- Analyze treatment effect ----
 
-d_exp <- d_pci %>% 
-  select(treat, i_4_1, i_4_2, whether.north) %>%
-  mutate(communication = ifelse(i_4_1=="Yes", 1, ifelse(i_4_1=="No", 0, NA))) %>%
-  mutate(representation = ifelse(i_4_2=="Yes", 1, ifelse(i_4_2=="No", 0, NA)))
+summary(glm(communication ~ treat, data=d_pci, family="binomial"))
 
-# Check balance of the people that responded
-MatchBalance(treat ~ a7_1 + a8_1,
-             data=na.omit(d_exp[ , c("treat", "communication")]))
+summary(glm(communication ~ treat + a13_2 + a13_2:treat, data=d_pci, family="binomial"))
+summary(glm(communication ~ treat + a13_2 + a13_2:treat + a7_3, data=d_pci, family="binomial")) # Central SOE equitized
 
-summary(d_pci$i_4_1)
-table(d_exp$communication)
-summary(d_pci$i_4_2)
+summary(glm(a13_2 ~ a7_3, data = d_pci, family="binomial"))
 
-summary(glm(communication ~ treat, data=d_exp, family="binomial"))
-summary(glm(representation ~ treat, data=d_exp, family="binomial"))
+with(d_pci, prop.table(table(a7_3, a13_2), margin=2))\
+with(d_pci, prop.table(table(a8_3, a13_2), margin=2))
+
+m <- matrix(1:4, 2)
+margin.table(m, 1)
+margin.table(m, 2)
+
+summary(glm(communication ~ treat + a14_5 + a14_5:treat, data=d_pci, family="binomial"))
+summary(glm(communication ~ treat + a14_6 + a14_6:treat, data=d_pci, family="binomial"))
+summary(glm(communication ~ treat + whether.north + whether.north:treat, data=d_pci, family="binomial"))
+
+summary(glm(representation ~ treat, data=d_pci, family="binomial"))
+summary(glm(representation ~ treat + whether.north + treat:whether.north, data=d_pci, family="binomial"))
 
 # ---- Heterogeneity analysis ----
 
