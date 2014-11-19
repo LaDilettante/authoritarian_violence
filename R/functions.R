@@ -216,7 +216,7 @@ f_addstar <- function(df, pvaluevar="p.value") {
 f_create_balancetable <- function(df, balance_vars, bal_result) {
   f_addstar(
     cbind.data.frame(
-      f_getlevelnames(d_pci, balance_vars),
+      f_getlevelnames(df, balance_vars),
       ldply(bal_result, function(x) 
         data.frame(mean.Tr=x$mean.Tr, mean.Co=x$mean.Co, p.value=x$p.value))
     )
