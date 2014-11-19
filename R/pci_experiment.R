@@ -3,7 +3,7 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("arm", "foreign", "Matching", "lme4", "plyr", "dplyr")
+packs <- c("arm", "foreign", "snow", "Matching", "lme4", "plyr", "dplyr")
 f_install_and_load(packs)
 
 # ---- Constants ----
@@ -88,10 +88,10 @@ ranef(m_whether.north)
 
 # ---- Matching to see if effect changes ----
 d_pci_match <- na.omit(d_pci[ , c("treat", c_balance_vars)])
-d_pci_match[ , which(sapply(d_pci_match, is.factor))] <- lapply(d_pci_match[ , which(sapply(d_pci_match, is.factor))], as.numeric)
 Tr <- d_pci_match[ , "treat"]
-X <- d_pci_match[ , c_balance_vars]
-gen1 <- GenMatch(Tr=Tr, X=X, pop.size=10000)
+X <- model.matrix(as.formula(paste("~", paste(c_balance_vars, collapse=" + "))), 
+                  data=d_pci_match)[ , -1]
+gen1 <- GenMatch(Tr=Tr, X=X, BalanceMatrix=X, pop.size=10000)
 mgen1 <- Match(Tr=Tr, X=X, Weight.matrix=gen1)
 MatchBalance(fm_balance, data=d_pci_match, match.out=mgen1, nboots=1000)
 
