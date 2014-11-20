@@ -89,8 +89,8 @@ ranef(m_whether.north)
 
 # ---- Matching to see if effect changes ----
 d_pci_match <- na.omit(d_pci[ , c("treat", c_balance_vars)])
-d_pci_match[ , which(sapply(d_pci_match, is.factor))] <- lapply(d_pci_match[ , which(sapply(d_pci_match, is.factor))], as.numeric)
 Tr <- d_pci_match[ , "treat"]
+<<<<<<< HEAD
 X <- d_pci_match[ , c_balance_vars]
 
 cl <- makeCluster(c("localhost", "localhost", "localhost", "localhost"), type = "SOCK")

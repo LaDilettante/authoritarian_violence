@@ -46,6 +46,14 @@ Durham, NC 27708 USA}
   Mathematical model of my authoritarian violence paper
 \end{abstract}
 
+\section{Multilevel model}
+
+\begin{align}
+&\text{goldstein}_i &&\sim N(\alpha^{countryyear}_{j[i]}, \sigma^2_{goldstein}) \\
+&\alpha_j^{countryyear} &&\sim N(\beta_{k[j]}^{country} + \gamma \cdot \text{liec}_j + \Gamma X_j, \sigma_{\alpha}^2) \\
+&\beta_k^{country} &&\sim N(\delta_{ethnic} \cdot \text{ethnic}_k, \sigma_\beta^2) 
+\end{align}
+
 
 \section{Multilevel model with instrumental variable}
 
