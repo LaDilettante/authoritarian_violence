@@ -3,7 +3,7 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("arm", "foreign", "Matching", "lme4", "plyr", "dplyr")
+packs <- c("arm", "foreign", "snow", "Matching", "lme4", "plyr", "dplyr")
 f_install_and_load(packs)
 
 # ---- Constants ----
@@ -32,7 +32,8 @@ d_pci <- d_pci %>%
   mutate(responded.comm = ifelse(!is.na(communication), 1, 0)) %>%
   mutate(responded.rep = ifelse(!is.na(representation), 1, 0)) %>%
   inner_join(d_distance, by=c("province")) %>%
-  rename(distance.from.hn = distance)
+  rename(distance.from.hn = distance) %>%
+  mutate(province = as.factor(province))
 
 # ---- Check balance ----
 
@@ -78,7 +79,7 @@ summary(glm(communication ~ treat + whether.north + whether.north:treat, data=d_
 
 # ---- Heterogeneity analysis ----
 
-m_whether.north <- glmer(communication ~ treat + (1 + treat | whether.north), 
+m_whether.north <- glmer(communication ~ treat + (1 + treat | province), 
                          data=d_pci, family="binomial")
 summary(m_whether.north)
 
@@ -91,7 +92,9 @@ d_pci_match <- na.omit(d_pci[ , c("treat", c_balance_vars)])
 d_pci_match[ , which(sapply(d_pci_match, is.factor))] <- lapply(d_pci_match[ , which(sapply(d_pci_match, is.factor))], as.numeric)
 Tr <- d_pci_match[ , "treat"]
 X <- d_pci_match[ , c_balance_vars]
-gen1 <- GenMatch(Tr=Tr, X=X, pop.size=10000)
+
+cl <- makeCluster(c("localhost", "localhost", "localhost", "localhost"), type = "SOCK")
+gen1 <- GenMatch(Tr=Tr, X=X, BalanceMatrix=X, cluster=cl, pop.size=10000)
 mgen1 <- Match(Tr=Tr, X=X, Weight.matrix=gen1)
 MatchBalance(fm_balance, data=d_pci_match, match.out=mgen1, nboots=1000)
 
