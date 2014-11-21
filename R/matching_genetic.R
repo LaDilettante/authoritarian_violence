@@ -69,7 +69,6 @@ mgen1 <- Match(Tr=Tr, X=X, Weight.matrix=gen1)
 
 balance_vars <- paste(c(names(BalanceMatrix)[1], paste("+", names(BalanceMatrix)[-1])), collapse=" ")
 fm_gen1 <- as.formula(paste(paste0(c_treatmentvar, ".", c_pretreat_length), "~", balance_vars))
-MatchBalance(fm_gen1, data=cbind.data.frame(liec6.1=Tr, BalanceMatrix), match.out=mgen1, nboots=1000)
 stopCluster(cl)
 
 par(mfrow=c(1, 2))

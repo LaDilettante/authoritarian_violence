@@ -133,7 +133,7 @@ reg.fit.mcmc = as.mcmc(reg.fit)
 # densityplot(reg.fit.mcmc)
 
 quantile(reg.fit$BUGSoutput$sims.matrix[,"g.liec"], c(.025, .05, .5, .95, .975))
+mean(reg.fit$BUGSoutput$sims.matrix[,"g.liec"] > 0)
+# HPDinterval(reg.fit.mcmc[,"g.liec"], prob=0.95
 
-plot(density(reg.fit$BUGSoutput$sims.matrix[,"g.liec"]))
-mean(reg.fit$BUGSoutput$sims.matrix[,"g.liec"] >= 0)
-# HPDinterval(reg.fit.mcmc[,"g.liec"], prob=0.95)
+save(reg.fit, reg.fit.mcmc, file="./data/private/multilevel_mcmc_result.RData")
