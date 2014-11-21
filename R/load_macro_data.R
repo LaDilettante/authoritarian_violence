@@ -8,11 +8,12 @@ d_dpi_raw <- DpiGet(vars=c("liec"))
 d_dpi <- d_dpi_raw  %>%
   filter(!(iso2c=="KH" & liec==3)) %>% # For some reasons Cambodia has duplicates liec = 3 the whole time series...
   mutate(liec = ifelse(liec==-999.0, NA, liec)) %>%
+  mutate(liec_cat = ifelse(liec <= 5, 0, ifelse(liec == 6, 1, ifelse(liec == 7, 2, NA)))) %>%
   mutate(liec5 = ifelse(liec >= 5, 1, 0)) %>%
   mutate(liec6 = ifelse(liec >= 6, 1, 0)) %>%
   mutate(liec7 = ifelse(liec >= 7, 1, 0)) %>%
   mutate(iso3c = countrycode(iso2c, origin="iso2c", destination="iso3c", warn=T)) %>%
-  select(iso3c, year, liec, liec5, liec6, liec7) %>%
+  select(iso3c, year, liec, liec_cat, liec5, liec6, liec7) %>%
   filter(year >= c_startyear)
 d_dpi <- unique(d_dpi)
 

@@ -68,8 +68,6 @@ f_create_balancetable(d_pci, c_balance_vars, m_bal_resrep)
 
 # ---- Analyze treatment effect ----
 
-summary(glm(communication ~ treat, data=d_pci, family="binomial"))
-
 summary(glm(communication ~ treat + a13_2 + a13_2:treat, data=d_pci, family="binomial"))
 summary(glm(communication ~ treat + a13_2 + a13_2:treat + a7_3, data=d_pci, family="binomial")) # Central SOE equitized
 summary(glm(communication ~ treat + a14_5 + a14_5:treat, data=d_pci, family="binomial"))
@@ -97,4 +95,5 @@ cl <- makeCluster(c("localhost", "localhost", "localhost", "localhost"), type = 
 gen1 <- GenMatch(Tr=Tr, X=X, BalanceMatrix=X, cluster=cl, pop.size=10000)
 mgen1 <- Match(Tr=Tr, X=X, Weight.matrix=gen1)
 MatchBalance(fm_balance, data=d_pci_match, match.out=mgen1, nboots=1000)
+stopCluster(cl)
 

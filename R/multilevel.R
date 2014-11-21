@@ -19,8 +19,10 @@ d_eventlevel <- na.omit(d_eventlevel)
 # ---- Set up index link ----
 d_countryyear <- unique(select(d_eventlevel,
                                countryyear, country, resource.pc, milexp.pc,
-                               liec, liec5, liec6, liec7,
-                               gwf_military, gwf_party, gwf_personal, gwf_duration))
+                               liec, liec_cat, liec5, liec6, liec7,
+                               lgdp, lgdppc,
+                               gwf_military, gwf_party, gwf_personal, gwf_monarchy,
+                               gwf_duration))
 d_country <- unique(select(d_eventlevel, 
                            country, ethnic.polarization, region))
 d_event <- unique(select(d_eventlevel,
@@ -41,28 +43,30 @@ for (k in (1:K)) {
 
 # ---- Set up data ----
 goldstein <- d_event$goldstein
+Xdissident_sector <- model.matrix(~ dissident_sector_name - 1, data=d_event)[, -1]
+dimXdissident_sector <- dim(Xdissident_sector)
+
 liec <- d_countryyear$liec5
 Xa <- with(d_countryyear, 
-           cbind.data.frame(milexp.pc, resource.pc, gwf_duration, 
+           cbind.data.frame(lgdppc, lgdp, resource.pc, milexp.pc, gwf_duration,
                             gwf_military, gwf_personal, gwf_party))
 dimXa <- dim(Xa)
 
-Xgoldstein <- model.matrix(~ dissident_sector_name - 1, data=d_event)[, -1]
-dimXgoldstein <- dim(Xgoldstein)
-
 ethnic <- d_country$ethnic.polarization
+Xregion <- model.matrix(~ region - 1, data=d_country)[, -1]
+dimXregion <- dim(Xregion)
 
 # Set up JAGS model
 # JAGS needs a list of names that contain the data
-reg.data = list("goldstein", "Xgoldstein", "dimXgoldstein",
+reg.data = list("goldstein", "dimXdissident_sector", "Xdissident_sector",
                 "liec", "Xa", "dimXa",
-                "ethnic",
+                "ethnic", "Xregion", "dimXregion",
                 "countryyear.idx", "country.idx", "N", "J", "K")
 
 # JAGS also needs a list of names of parameters
 reg.params = c("a", "A", "sigma.goldstein", "phi.goldstein",
                "b", "g.liec", "G", "sigma.a", "phi.a",
-               "d.ethnic", "sigma.b", "phi.b")
+               "d", "d.ethnic", "Dregion", "sigma.b", "phi.b")
 
 # Initial values of parameters are optional; JAGS can compute
 # its own initial values, but sometimes they can be a little crazy
@@ -72,12 +76,12 @@ reg.params = c("a", "A", "sigma.goldstein", "phi.goldstein",
 reg.model <- function() {
   # Model structure
   for (i in 1:N){
-    goldstein[i] ~ dnorm(a[countryyear.idx[i]] + A %*% Xgoldstein[i, ], 
+    goldstein[i] ~ dnorm(a[countryyear.idx[i]] + A %*% Xdissident_sector[i, ], 
                          sigma.goldstein)
   }
   sigma.goldstein <- 1 / phi.goldstein
   phi.goldstein ~ dgamma(1, 1)
-  for (i in 1:dimXgoldstein[2]) {
+  for (i in 1:dimXdissident_sector[2]) {
     A[i] ~ dnorm(0, .0001)
   }
   
@@ -93,11 +97,16 @@ reg.model <- function() {
   }
   
   for (k in 1:K) {
-    b[k] ~ dnorm(d.ethnic*ethnic[k], sigma.b)
+    b[k] ~ dnorm(d + d.ethnic*ethnic[k] + Dregion %*% Xregion[k, ], 
+                 sigma.b)
   }
   sigma.b <- 1 / phi.b
   phi.b ~ dgamma(1, 1)
   d.ethnic ~ dnorm(0, .0001)
+  d ~ dnorm(0, .0001)
+  for (q in 1:dimXregion[2]) {
+    Dregion[q] ~ dnorm(0, .0001)
+  }
 }
 
 # Actually running the MCMC step.  JAGS lets you control:
@@ -108,7 +117,7 @@ reg.model <- function() {
 reg.fit <- jags.parallel(data=reg.data, 
                          parameters.to.save=reg.params,
                          n.chains=3,
-                         n.thin=2,
+                         n.thin=1,
                          n.iter=11000, n.burnin=1000, 
                          model.file=reg.model)
 
@@ -124,7 +133,7 @@ reg.fit.mcmc = as.mcmc(reg.fit)
 # densityplot(reg.fit.mcmc)
 
 quantile(reg.fit$BUGSoutput$sims.matrix[,"g.liec"], c(.025, .05, .5, .95, .975))
+
 plot(density(reg.fit$BUGSoutput$sims.matrix[,"g.liec"]))
 mean(reg.fit$BUGSoutput$sims.matrix[,"g.liec"] >= 0)
 # HPDinterval(reg.fit.mcmc[,"g.liec"], prob=0.95)
-
