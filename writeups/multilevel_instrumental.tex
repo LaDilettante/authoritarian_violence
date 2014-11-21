@@ -1,0 +1,34 @@
+\section{Multilevel model with instrumental variable}
+
+Unit indexed by $i$, group indexed by $j$. Model with treatment $T$ and IV $z$ both at the group level. There are also covariates at the group level, and none at the individual level.
+
+\begin{align}
+y_i &\sim N(\alpha_{j[i]}, \sigma_y^2) \\
+\col{\alpha_j \\ T_j} &\sim 
+N \left(
+    \col{\gamma_0 + \gamma_1 T_j + \gamma_2 x_j\\\mu_0 + \mu_1 z_j} ,
+    \left[
+    \begin{matrix}
+      \sigma^2_\alpha & \rho \sigma_\alpha \sigma_T \\
+      \rho \sigma_\alpha \sigma_T & \sigma^2_T
+    \end{matrix}
+    \right]
+\right)
+\end{align}
+
+In our paper,
+
+\begin{align}
+T_j &= \text{legislature in country-year}_j \\
+z_j &= \text{inherited parties in country-year}_j \\
+x_j &= \text{other covariates in country-year}_j
+\end{align}
+
+Notice that in the model, $T_j$ is not assumed to be uncorrelated with the error term of $\alpha_j$ (the non-diagonal covariance is non-zero), but $z_j$ is (implicitly since it's un-modeled). Writing it out in non-multilevel form:
+
+\begin{align}
+\alpha_j &= \gamma_0 + \gamma_1 T_j + \gamma_2 x_j + \epsilon_\alpha = N(\gamma_0 + \gamma_1 T_j + \gamma_2 x_j, \sigma_\alpha)\\
+T_j &= \mu_0 + \mu_1 + \epsilon_T = N(\mu_0 + \mu_1, \sigma_T)
+\end{align}
+
+In the multilevel model, we allow $T_j$ to be correlated with $\epsilon_\alpha$ via $\rho \sigma_\alpha \sigma_T$

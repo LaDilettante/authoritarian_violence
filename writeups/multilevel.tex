@@ -1,94 +1,35 @@
-\documentclass[12pt]{article}
+\subsection{The model}
 
-% This first part of the file is called the PREAMBLE. It includes
-% customizations and command definitions. The preamble is everything
-% between \documentclass and \begin{document}.
+Given that my dependent variable of interest (\textit{violence}) is at the event level, while my ``treatment'' (\textit{legislature}) is at the country year level, a Bayesian hierarchical model as the most appropriate choice.\footnote{The choice of Bayesian hierarchical model is largely practical: with 15,037 events, popular R packages to fit frequentist hierarchical model do not converge due to a high chance of numerical issues.}  Each event belongs to a country-year, and each country-year belongs to a country. The intercept at each level varies according to the group the unit belongs to. This model choice is superior to the alternative option, which is to aggregate the event-level data up to the country-year level and run a fixed effect model. Doing so will 1) ignore the variation at the event level, resulting in standard errors that are too small; 2) leave the aggregation mechanisms up to the researcher with no clear theoretical reasoning.\footnote{Should we measure the level of violence within a country year by averaging across events? Why not the median? Or count the number of positive / negative events? The choice is not likely to be theoretically driven and open to abuse.}
 
-\usepackage[margin=1in]{geometry}  % set the margins to 1in on all sides
-\usepackage{graphicx}              % to include figures
-\usepackage{amsmath}               % great math stuff
-\usepackage{amsfonts}              % for blackboard bold, etc
-\usepackage{amsthm}                % better theorem environments
+All parameters have conjugate un-informative prior so that the result is driven entirely by the data instead of the prior.\footnote{More specifically, the prior for coefficient estimates is $Normal(\text{mean}=0, \text{precision}=.0001)$. The prior for the variance parameters is $Inverse-Gamma(1, 1)$} The model is thus:
 
+\begin{alignat*}{2}
+&{event}_i &&\sim N(\alpha^{countryyear}_{j[i]} + A \cdot \text{sector}_i, \sigma^2_{event}) \\
+&\alpha_j^{countryyear} &&\sim N(\beta_{k[j]}^{country} + \gamma \cdot \text{legis}_j + \Gamma X_j, \sigma_{\alpha}^2) \\
+&\beta_k^{country} &&\sim N(\delta_0 + \delta_{ethnic} \cdot \text{ethnic}_k + D \cdot \text{region}, \sigma_\beta^2) 
+\end{alignat*}
 
-% various theorems, numbered by section
+At the event level:
 
-\newtheorem{thm}{Theorem}[section]
-\newtheorem{lem}[thm]{Lemma}
-\newtheorem{prop}[thm]{Proposition}
-\newtheorem{cor}[thm]{Corollary}
-\newtheorem{conj}[thm]{Conjecture}
-
-\DeclareMathOperator{\id}{id}
-
-\newcommand{\bd}[1]{\mathbf{#1}}  % for bolding symbols
-\newcommand{\RR}{\mathbb{R}}      % for Real numbers
-\newcommand{\ZZ}{\mathbb{Z}}      % for Integers
-\newcommand{\col}[1]{\left[\begin{matrix} #1 \end{matrix} \right]}
-\newcommand{\comb}[2]{\binom{#1^2 + #2^2}{#1+#2}}
+\begin{conditions*}
+\alpha^{countryyear}_{j[i]}    &  intercept of $countryyear_j$ to which $event_i$ belongs\\
+\text{sector}_i     &  matrix of dummies for the dissident sector of $event_i$  \\
 
 
-\begin{document}
+\end{conditions*}
 
+At the country year level:
+\begin{conditions*}
+\beta_{k[j]}^{country} &  intercept of $country_k$ to which $countryyear_j$ belongs. In traditional panel data model, this is the country fixed effect. \\
+\text{legis}_j & dummy variable for legislature. This is our parameter of interest. \\
+X_j & matrix of other control variables, including log(GDP), log(GDP per capita), military expenditure (as \% of GDP), oil and mineral export (as \% of GDP), regime duration (years), and authoritarian typology (military, personal, and party as coded by Geddes et. al)
+\end{conditions*}
 
-\nocite{*}
+At the country level:
+\begin{conditions*}
+\text{ethnic} & level of ethnic fractionalization as defined by Fearon \\
+\text{region} & matrix of regional dummies
+\end{conditions*}
 
-\title{A Sample Mathematics Paper}
-
-\author{Anh Le\thanks{Grant support listed here.} \\ 
-Department of Political Science \\
-Duke University \\
-Durham, NC 27708 USA}
-
-\maketitle
-
-\begin{abstract}
-  Mathematical model of my authoritarian violence paper
-\end{abstract}
-
-\section{Multilevel model}
-
-\begin{align}
-&\text{goldstein}_i &&\sim N(\alpha^{countryyear}_{j[i]}, \sigma^2_{goldstein}) \\
-&\alpha_j^{countryyear} &&\sim N(\beta_{k[j]}^{country} + \gamma \cdot \text{liec}_j + \Gamma X_j, \sigma_{\alpha}^2) \\
-&\beta_k^{country} &&\sim N(\delta_{ethnic} \cdot \text{ethnic}_k, \sigma_\beta^2) 
-\end{align}
-
-
-\section{Multilevel model with instrumental variable}
-
-Unit indexed by $i$, group indexed by $j$. Model with treatment $T$ and IV $z$ both at the group level. There are also covariates at the group level, and none at the individual level.
-
-\begin{align}
-y_i &\sim N(\alpha_{j[i]}, \sigma_y^2) \\
-\col{\alpha_j \\ T_j} &\sim 
-N \left(
-    \col{\gamma_0 + \gamma_1 T_j + \gamma_2 x_j\\\mu_0 + \mu_1 z_j} ,
-    \left[
-    \begin{matrix}
-      \sigma^2_\alpha & \rho \sigma_\alpha \sigma_T \\
-      \rho \sigma_\alpha \sigma_T & \sigma^2_T
-    \end{matrix}
-    \right]
-\right)
-\end{align}
-
-In our paper,
-
-\begin{align}
-T_j &= \text{legislature in country-year}_j \\
-z_j &= \text{inherited parties in country-year}_j \\
-x_j &= \text{other covariates in country-year}_j
-\end{align}
-
-Notice that in the model, $T_j$ is not assumed to be uncorrelated with the error term of $\alpha_j$ (the non-diagonal covariance is non-zero), but $z_j$ is (implicitly since it's un-modeled). Writing it out in non-multilevel form:
-
-\begin{align}
-\alpha_j &= \gamma_0 + \gamma_1 T_j + \gamma_2 x_j + \epsilon_\alpha = N(\gamma_0 + \gamma_1 T_j + \gamma_2 x_j, \sigma_\alpha)\\
-T_j &= \mu_0 + \mu_1 + \epsilon_T = N(\mu_0 + \mu_1, \sigma_T)
-\end{align}
-
-In the multilevel model, we allow $T_j$ to be correlated with $\epsilon_\alpha$ via $\rho \sigma_\alpha \sigma_T$
-
-
-\end{document}
+I fit this model with a Gibbs sampler written in JAGS, running 3 chains, each has 11,000 iterations with 1,000 burn-ins. The mixing is excellent and the result is consistent across 3 chains. More model diagnostics details can be seen in \autopageref{sec:modeldiagnostic}
