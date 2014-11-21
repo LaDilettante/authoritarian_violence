@@ -2,8 +2,6 @@
 
 Since the two prompts are randomly sent out to business, we have excellent balance across observable co-variates as shown in \autoref{tab:balance}.
 
-In addition, to guard against concerns that this question may be politically sensitive, leading to systematic bias in non-response, I also check and confirm that firms with the treatment form does not have a different non-response rate ($\textbf{p-value} = 0.12$).
-
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrl}
@@ -53,4 +51,59 @@ Limited Liability & 0.54 & 0.57 & 0.09 & * \\
 \end{tabular}
 \caption{Covariate balance in survey experiment}
 \label{tab:balance}
+\end{table}
+
+In addition, to guard against concerns that the treatment prompt may be politically sensitive, I also check and confirm that firms with the treatment form does not have a different non-response rate ($\textbf{p-value} = 0.12$).
+
+Finally, to guard against systematic bias in non-response, I check the co-variate balance between firms that responded and those that did not in \autopageref{tab:balance_response}. The results suggest some issues with co-variate balance: firms with educated CEOs and CEOs with former ties to state businesses respond slightly more. This means that the population observed in the experiment may be different, leading to difficulty in generalizing our ATE (average treatment effect) to PATE (population average treatment effect). However, educated businessmen with political ties are precisely the group most likely to be co-opted, this is in fact the group that we should pay most attention to. Therefore, while our treatment effect may not generalize to ordinary Vietnamese businessman, it does comport with the focus of our study on political elites.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrl}
+  \hline
+ & Mean (resp) & Mean (non-resp) & p-value &   \\ 
+  \hline
+Limited Liability & 0.55 & 0.56 & 0.81 &  \\ 
+  Joint Stock & 0.23 & 0.20 & 0.01 & ** \\ 
+  Partnership & 0.00 & 0.00 & 0.75 &  \\ 
+  Other form of ownership & 0.00 & 0.00 & 0.04 & ** \\ 
+  Manufacturing & 0.09 & 0.08 & 0.42 &  \\ 
+  Construction & 0.27 & 0.24 & 0.00 & *** \\ 
+  Service & 0.67 & 0.68 & 0.15 &  \\ 
+  Agriculture & 0.09 & 0.07 & 0.00 & *** \\ 
+  Mining & 0.02 & 0.02 & 0.03 & ** \\ 
+  Revenue (0.5-1 billion VND) & 0.22 & 0.22 & 0.98 &  \\ 
+  Revenue (1-5 billion VND) & 0.43 & 0.41 & 0.20 &  \\ 
+  Revenue (5-10 billion VND) & 0.08 & 0.08 & 0.84 &  \\ 
+  Revenue (10-50 billion VND) & 0.05 & 0.05 & 0.91 &  \\ 
+  Revenue (50-200 billion VND) & 0.01 & 0.01 & 0.52 &  \\ 
+  Revenue (200-500 billion VND) & 0.00 & 0.00 & 0.85 &  \\ 
+  Revenue (above 500 billion VND) & 0.00 & 0.00 & 0.26 &  \\ 
+  Size (5-9 people) & 0.35 & 0.33 & 0.15 &  \\ 
+  Size (10-49 people) & 0.22 & 0.23 & 0.77 &  \\ 
+  Size (50-199 people) & 0.06 & 0.05 & 0.24 &  \\ 
+  Size (200-299 people) & 0.01 & 0.01 & 0.93 &  \\ 
+  Size (300-499 people) & 0.00 & 0.00 & 0.43 &  \\ 
+  Size (500-1000 people) & 0.00 & 0.00 & 0.96 &  \\ 
+  Size (more than 1000 people) & 0.00 & 0.00 & 0.67 &  \\ 
+  Main customer (State) & 0.19 & 0.17 & 0.02 & ** \\ 
+  Main customer (Private) & 0.60 & 0.63 & 0.01 & ** \\ 
+  Main customer (Foreign in VN) & 0.04 & 0.04 & 0.96 &  \\ 
+  Main customer (Foreign, direct) & 0.03 & 0.03 & 0.85 &  \\ 
+  Main customer (Foreign, indirect) & 0.01 & 0.01 & 0.78 &  \\ 
+  Equitized local state-owned enterprise & 0.06 & 0.05 & 0.35 &  \\ 
+  Equitized central state-owned enterprise & 0.01 & 0.01 & 0.60 &  \\ 
+  Firm with some state-owned equities & 0.03 & 0.02 & 0.52 &  \\ 
+  Firm that was formerly household business & 0.73 & 0.70 & 0.00 & ** \\ 
+  Firm with shares listed & 0.00 & 0.00 & 0.78 &  \\ 
+  Firm owner graduated from university & 0.63 & 0.58 & 0.00 & *** \\ 
+  Firm owner with MBA & 0.04 & 0.03 & 0.06 & * \\ 
+  Firm owner was a leader of a State agency & 0.04 & 0.03 & 0.04 & ** \\ 
+  Firm owner was a military officer & 0.05 & 0.04 & 0.12 &  \\ 
+  Firm owner was a manager of SOE & 0.12 & 0.11 & 0.03 & ** \\ 
+  Firm owner was an employee at SOE & 0.15 & 0.14 & 0.48 &  \\ 
+   \hline
+\end{tabular}
+\caption{Covariate balance between firms that responded and firms that did not}
+\label{tab:balance_response}
 \end{table}
