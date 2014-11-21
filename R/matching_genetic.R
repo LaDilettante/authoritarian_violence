@@ -8,7 +8,7 @@ rm(list=ls())
 # Load external functions
 source("./R/functions.R")
 # Load packages
-packs <- c("gridExtra", "Matching", "plyr", "dplyr", "ggplot2")
+packs <- c("gridExtra", "snow", "Matching", "plyr", "dplyr", "ggplot2")
 f_install_and_load(packs) ; rm(packs)
 
 # ---- Some constant ----
@@ -63,12 +63,14 @@ BalanceMatrix <- X %>%
          resource.ethnic = resource.pc.0 * ethnic.polarization.0)
 
 # ---- Do the matching ----
+cl <- makeCluster(c("localhost", "localhost", "localhost", "localhost"), type = "SOCK")
 gen1 <- GenMatch(Tr=Tr, X=X, BalanceMatrix=BalanceMatrix, pop.size=10000)
 mgen1 <- Match(Tr=Tr, X=X, Weight.matrix=gen1)
 
 balance_vars <- paste(c(names(BalanceMatrix)[1], paste("+", names(BalanceMatrix)[-1])), collapse=" ")
 fm_gen1 <- as.formula(paste(paste0(c_treatmentvar, ".", c_pretreat_length), "~", balance_vars))
 MatchBalance(fm_gen1, data=cbind.data.frame(liec6.1=Tr, BalanceMatrix), match.out=mgen1, nboots=1000)
+stopCluster(cl)
 
 par(mfrow=c(1, 2))
 with(d_to_be_matched, 
