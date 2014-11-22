@@ -1,20 +1,3 @@
-\section{Empirics}
-
-\subsection{Description of data}
-
-\begin{itemize}
-
-\item Dependent variable: \textit{legislature}, operationalized as $LIEC \geq 5$ 
-
-As my theoretical argument emphasizes the role of the legislature as an informational and commitment device, I code a country-year as having a legislature if multiple parties are legal. Even if opposition parties do not win seat, the electoral process also conveys information about the organizational strength and the preference of both sides. This coding rule operationalizes as having LIEC (Legislative Index of Electoral Competitiveness) be 5 or higher in the DPI (Database of Political Institutions).\footnote{The values LIEC are as follows: 4---1 party, multiple candidates; 5---multiple parties are legal but only one party won seats; 6---multiple parties did win seats but the largest party received more than 75\% of the seats; 7---largest party got less than 75\% (DPI 14)}
-
-\item Independent variable: \textit{violence} in regime-dissident interaction
-
-Using a dataset of machine coded news reports around the world from 1991-2012, I am able to look at individual events that happened between the regime and the dissident, enabling an analysis at a highly granular level. These event data come from ICEWS (Integrated Crisis Early Warning System), a project funded by DARPA (Defense Advanced Research Projects Agency) to aid the US policy makers in predicting and responding to crises around the world . These news articles are harvested from ``over 75 international sources (AP, UPI, and BBC Monitor) as well as regional sources (India Today, Jakarta Post, Pakistan Newswire, and Saigon Times),'' ensuring comprehensive coverage  (cite O'Brien 2010 (94), 2013). While this dataset has been de-duplicated once so that an event covered by multiple news report only shows up once, I created my own filter to delete duplicates that share the same source actor, target actor, and happen at the same time and place.
-
-These text data are then processed with Schrodt's TABARI event data coding system to determine the nature and the intensity of the reported political activity. In addition, the event is matched with a dictionary of actors (with over 8,000 entries) that further divides into five broad categories: religious, governmental, dissidents, business, and other. In sum, from this database I am able to extract any interaction between the government and the dissident, where and when it happens, and its level of violence (measured by the Goldstein score\footnote{The Goldstein score is a measure of intensity of conflict or cooperation, developed by Joshua S. Goldstein. The score has values from -10 (Military attack, clash, assault), 0 (Explain or state policy, state future position) to 8.3(Extend military assistance) See Goldstein 375 for how the event types are coded into this scale).}
-\end{itemize}
-
 \subsection{Empirical strategy}
 
 First, my empirical strategy improves over the extant literature with a careful choice of country-years to study. Scholars in the authoritarian legislature have customarily count all authoritarian country-years with an existing legislature in the sample. However, this risks including dictatorships that passively inherited the legislature from the previous regime, who would rather abolish the institution if not for the fear of backlash. On the spreadsheet, such cases would look identical to an autocrat opening up to co-opt the opposition, yet the logic is entirely different. To use a cautionary example, in Preworski and Gandhi (1283), the legally enforced two-party legislature under the Brazilian junta government is not a reformist institution created by the autocrat to facilitate power sharing but a gutted down legislature when the election result did not go the regime's way. To guard against this possibility, I only look at authoritarian regimes that created  legislature during its rule as the ``treatment'' group. (From now on, I will use ``treatment'' as a shorthand for the creation of the legislature).
@@ -23,7 +6,7 @@ Second, it is important to recognize that an authoritarian regime without a legi
 
 To setup the correct counter factual, I use matching to create a sample of comparable cases. The crux of the strategy is to find two country years similar along all covariates in year $t$ (including $\text{violence}_t$), but one has a legislature in the next year while the other does not. Then, the difference in violence between these two cases in the ensuing period is attributable to the legislature.
 
-This strategy is implemented as follows. First, to construct the treated population, I look at all country years in which an authoritarian legislature is created and build a four-year panel around it, including the one year before the treatment, and the three years after. Second, to construct the control population, I build similar four-year panels from all the other authoritarian country years without a legislature. Finally, for each panel in my treated population, I find its closest match from the control population based on their first year (which is the pre-treatment year for the treated countries). I match on level of violence and other covariates as reported in \autoref{tab:matching_balance_largen}, significantly improving the balance across the board. The matched pairs of panel are reported in \autoref{tab:matched_pairs}. Given that factors that affect violence may have various non-linear effect, matching alleviates the serious concern about functional misspecification. 
+This strategy is implemented as follows. First, to construct the treated population, I look at all country years in which an authoritarian legislature is created and build a four-year panel around it, including the one year before the treatment, and the three years after. Second, to construct the control population, I build similar four-year panels from all the other authoritarian country years without a legislature. Finally, for each panel in my treated population, I use genetic matching to find its closest match from the control population based on their first year (which is the pre-treatment year for the treated countries). I match on level of violence and other covariates as reported in \autoref{tab:matching_balance_largen}, significantly improving the balance across the board. The matched pairs of panel are reported in \autoref{tab:matched_pairs}. Given that factors that affect violence may have various non-linear effect, matching alleviates the serious concern about functional misspecification. 
 
 In general, matching alone does not recover the correct causal inference when there is selection based on unobservables. However, in this case, it addresses the most important concerns. First, as discussed above, matching on the level of violence in the pre-treatment year creates a sample of regimes with similar violence trajectory, and thus sets up the correct counter factual. Second, even though there is a risk of regimes creating legislature in anticipation of violence, this requires a significant ability from the regime to monitor the capability and the preference of the opposition. In the absence of a legislature, this information is likely to come from the security apparatus---therefore, the military expenditure (as a percentage of GDP) is matched on as a proxy control for the regime's capacity to anticipate violence.
 
@@ -32,9 +15,9 @@ In general, matching alone does not recover the correct causal inference when th
 \begin{tabular}{lrrlrrrl}
   \hline
  & \multicolumn{2}{c}{Pre-Match} &   \multicolumn{2}{c}{Post-Match} \\
-Covariate & Treated mean & Control mean & p-value & Treated mean & Control mean & p-value &  \\ 
+Covariate & Treated & Control & p-value & Treated & Control & p-value &  \\ 
   \hline
-Ethnic Fractionalization \_ & 0.61 & 0.59 & 0.59 & 0.61 & 0.60 & 0.81 &  \\ 
+Ethnic Fractionalization & 0.61 & 0.59 & 0.59 & 0.61 & 0.60 & 0.81 &  \\ 
 Violence (Goldstein score) & -4.50 & -4.05 & 0.51 & -4.50 & -4.49 & 0.94 &  \\ 
 $\text{Violence}^2$ & 29.84 & 23.22 & 0.34 & 29.84 & 29.03 & 0.65 &  \\ 
 Regime duration (years) & 12.08 & 34.30 & 0.00*** & 12.08 & 12.71 & 0.71 &  \\ 
@@ -44,16 +27,17 @@ Monarchy & 0.04 & 0.25 & 0.00*** & 0.04 & 0.04 & 1.00 &  \\
 Party & 0.29 & 0.48 & 0.07* & 0.29 & 0.29 & 1.00 &  \\ 
 log(gdp) & 22.65 & 23.95 & 0.00*** & 22.65 & 22.78 & 0.67 &  \\ 
 log(gdp per capita) & 7.63 & 8.58 & 0.00*** & 7.63 & 7.65 & 0.95 &  \\ 
-Military expenditure (\% of GDP) & 2.44 & 4.34 & 0.00*** & 2.44 & 2.40 & 0.89 &  \\
+Military expenditure (\%GDP) & 2.44 & 4.34 & 0.00*** & 2.44 & 2.40 & 0.89 &  \\
 Land (1000 $\text{km}^2$)& 760.22 & 1674.68 & 0.00*** & 760.21 & 783.37 & 0.80 &  \\ 
 Population (million) & 22.62 & 140.73 & 0.00*** & 22.62 & 21.74 & 0.90 &  \\
-Natural Resource Export (\% of GDP) & 14.79 & 22.64 & 0.03** & 14.79 & 14.16 & 0.72 &  \\ 
-Resource $\times$ Ethnic & 8.61 & 14.43 & 0.01** & 8.61 & 8.33 & 0.82 &  \\ 
-   \hline
+Resource Export (\%GDP) & 14.79 & 22.64 & 0.03** & 14.79 & 14.16 & 0.72 &  \\ 
+Resource $\times$ Ethnic & 8.61 & 14.43 & 0.01** & 8.61 & 8.33 & 0.82 & \\
+  \hline
 \end{tabular}
 \caption{Pre and Post-Matching Balance}
 \label{tab:matching_balance_largen}
 \end{sidewaystable}
+
 
 \begin{table}[ht]
 \centering

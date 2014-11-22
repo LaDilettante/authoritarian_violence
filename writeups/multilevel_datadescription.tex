@@ -1,0 +1,14 @@
+\subsection{Description of data}
+
+\begin{itemize}
+
+\item Dependent variable: \textit{legislature}, operationalized as $LIEC \geq 5$ 
+
+As my theoretical argument emphasizes the role of the legislature as an informational and commitment device, I code a country-year as having a legislature if multiple parties are legal. Even if opposition parties do not win seat, the electoral process also conveys information about the organizational strength and the preference of both sides. This coding rule operationalizes as having LIEC (Legislative Index of Electoral Competitiveness) be 5 or higher in the DPI (Database of Political Institutions).\footnote{The values LIEC are as follows: 4---1 party, multiple candidates; 5---multiple parties are legal but only one party won seats; 6---multiple parties did win seats but the largest party received more than 75\% of the seats; 7---largest party got less than 75\% (DPI 14)}
+
+\item Independent variable: \textit{violence} in regime-dissident interaction
+
+Using a dataset of machine coded news reports around the world from 1991-2012, I am able to look at individual events that happened between the regime and the dissident, enabling an analysis at a highly granular level. These event data come from ICEWS (Integrated Crisis Early Warning System), a project funded by DARPA (Defense Advanced Research Projects Agency) to aid the US policy makers in predicting and responding to crises around the world . These news articles are harvested from ``over 75 international sources (AP, UPI, and BBC Monitor) as well as regional sources (India Today, Jakarta Post, Pakistan Newswire, and Saigon Times),'' ensuring comprehensive coverage  (cite O'Brien 2010 (94), 2013). While this dataset has been de-duplicated once so that an event covered by multiple news report only shows up once, I created my own filter to delete duplicates that share the same source actor, target actor, and happen at the same time and place.
+
+These text data are then processed with Schrodt's TABARI event data coding system to determine the nature and the intensity of the reported political activity. In addition, the event is matched with a dictionary of actors (with over 8,000 entries) that further divides into five broad categories: religious, governmental, dissidents, business, and other. In sum, from this database I am able to extract any interaction between the government and the dissident, where and when it happens, and its level of violence (measured by the Goldstein score\footnote{The Goldstein score is a measure of intensity of conflict or cooperation, developed by Joshua S. Goldstein. The score has values from -10 (Military attack, clash, assault), 0 (Explain or state policy, state future position) to 8.3(Extend military assistance) See Goldstein 375 for how the event types are coded into this scale).}
+\end{itemize}

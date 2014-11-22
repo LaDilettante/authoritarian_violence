@@ -18,6 +18,21 @@
     citecolor={blue!50!black},
     urlcolor={blue!80!black}
 }
+\usepackage{cleveref}
+
+% bibliography
+\usepackage{natbib}
+% \bibpunct{(}{)}{;}{a}{}{,}
+
+\usepackage{array,tabularx}
+
+\newenvironment{conditions*}
+  {\par\vspace{\abovedisplayskip}\noindent
+   \tabularx{\columnwidth}{>{$}l<{$} @{${}={}$} >{\raggedright\arraybackslash}X}}
+  {\endtabularx\par\vspace{\belowdisplayskip}}
+  
+\usepackage{float}
+\restylefloat{table}
 
 % various theorems, numbered by section
 
@@ -35,14 +50,7 @@
 \newcommand{\col}[1]{\left[\begin{matrix} #1 \end{matrix} \right]}
 \newcommand{\comb}[2]{\binom{#1^2 + #2^2}{#1+#2}}
 
-\usepackage{array,tabularx}
-
-\newenvironment{conditions*}
-  {\par\vspace{\abovedisplayskip}\noindent
-   \tabularx{\columnwidth}{>{$}l<{$} @{${}={}$} >{\raggedright\arraybackslash}X}}
-  {\endtabularx\par\vspace{\belowdisplayskip}}
-
-\title{Prelim paper}
+\title{The effect of authoritarian legislature on regime-opposition interaction}
 \author{Anh Le}
 
 
@@ -50,17 +58,32 @@
 \maketitle
 
 \input{introduction}
+\input{argument_overview}
 \input{theory}
-\input{empirics_largeN}
-\input{multilevel}
+
+\section{Cross-country analysis of political violence using event data}
+\label{sec:empirics_largeN}
+
+\input{multilevel_datadescription}
+\input{multilevel_empiricalstrategy}
+\input{multilevel_model}
 \input{multilevel_result}
 
 \section{Survey Experiment}
+\label{sec:empirics_survey}
+
 \input{experiment_description}
 \input{experiment_checking}
 \input{experiment_result}
 
+\input{conclusion}
+
+\pagebreak
 \appendix
 \input{appendix_modeldiagnostic}
+
+\pagebreak
+\bibliographystyle{chicago}
+\bibliography{library}
 
 \end{document}
