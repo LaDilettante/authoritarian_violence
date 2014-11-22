@@ -1,16 +1,16 @@
 \subsection{Empirical strategy}
 
-First, my empirical strategy improves over the extant literature with a careful choice of country-years to study. Scholars in the authoritarian legislature have customarily count all authoritarian country-years with an existing legislature in the sample. However, this risks including dictatorships that passively inherited the legislature from the previous regime, who would rather abolish the institution if not for the fear of backlash. On the spreadsheet, such cases would look identical to an autocrat opening up to co-opt the opposition, yet the logic is entirely different. To use a cautionary example, in Preworski and Gandhi (1283), the legally enforced two-party legislature under the Brazilian junta government is not a reformist institution created by the autocrat to facilitate power sharing but a gutted down legislature when the election result did not go the regime's way. To guard against this possibility, I only look at authoritarian regimes that created  legislature during its rule as the ``treatment'' group. (From now on, I will use ``treatment'' as a shorthand for the creation of the legislature).
+First, my empirical strategy improves over the extant literature with a careful choice of country-years to study. Scholars in the authoritarian legislature have customarily counted all authoritarian country-years with an existing legislature in the sample. However, this risks including dictatorships that passively inherited the legislature from the previous regime, who would rather abolish the institution if not for the fear of backlash. On the spreadsheet, such cases would look identical to an autocrat opening up to co-opt the opposition, yet the logic is entirely different. To use a cautionary example, in \citet[1283]{Gandhi2007}, the legally enforced two-party legislature under the Brazilian junta government is not a reformist institution created by the autocrat to facilitate power sharing but a gutted down legislature when the election result did not go the regime's way \citep{Stepan1976}. To guard against this possibility, I only look at authoritarian regimes that created  legislature during its rule as the ``treatment'' group. (From now on, I will use ``treatment'' as a shorthand for the creation of the legislature).
 
 Second, it is important to recognize that an authoritarian regime without a legislature is not the correct counter factual, and thus make a very poor control group. Indeed, a regime may not create a co-opting legislature because there is never a sufficient threat of violence from the opposition. Therefore, even though we may see that regimes without legislature are very peaceful, this does not mean that a legislature has no effect on regime-dissident interaction. Conversely, a regime under rising violent threat may institute a legislature that successfully puts a lid on the growing discontent. However, since the level of violence is now constant, it will look as though the legislature had no effect.
 
 To setup the correct counter factual, I use matching to create a sample of comparable cases. The crux of the strategy is to find two country years similar along all covariates in year $t$ (including $\text{violence}_t$), but one has a legislature in the next year while the other does not. Then, the difference in violence between these two cases in the ensuing period is attributable to the legislature.
 
-This strategy is implemented as follows. First, to construct the treated population, I look at all country years in which an authoritarian legislature is created and build a four-year panel around it, including the one year before the treatment, and the three years after. Second, to construct the control population, I build similar four-year panels from all the other authoritarian country years without a legislature. Finally, for each panel in my treated population, I use genetic matching to find its closest match from the control population based on their first year (which is the pre-treatment year for the treated countries). I match on level of violence and other covariates as reported in \autoref{tab:matching_balance_largen}, significantly improving the balance across the board. The matched pairs of panel are reported in \autoref{tab:matched_pairs}. Given that factors that affect violence may have various non-linear effect, matching alleviates the serious concern about functional misspecification. 
+This strategy is implemented as follows. First, to construct the treated population, I look at all country years in which an authoritarian legislature is created and build a four-year panel around it, including the one year before the treatment, and the three years after. Second, to construct the control population, I build similar four-year panels from all the other authoritarian country years without a legislature. Finally, for each panel in my treated population, I use genetic matching to find its closest match from the control population based on their first year (which is the pre-treatment year for the treated countries). I match on level of violence and other covariates as reported in the next page, significantly improving the balance across the board. The matched pairs of panel are reported in \Cref{tab:matched_pairs}. Given that factors that affect violence may have various non-linear effect, matching alleviates the serious concern about functional misspecification. 
 
 In general, matching alone does not recover the correct causal inference when there is selection based on unobservables. However, in this case, it addresses the most important concerns. First, as discussed above, matching on the level of violence in the pre-treatment year creates a sample of regimes with similar violence trajectory, and thus sets up the correct counter factual. Second, even though there is a risk of regimes creating legislature in anticipation of violence, this requires a significant ability from the regime to monitor the capability and the preference of the opposition. In the absence of a legislature, this information is likely to come from the security apparatus---therefore, the military expenditure (as a percentage of GDP) is matched on as a proxy control for the regime's capacity to anticipate violence.
 
-\begin{sidewaystable}[ht]
+\begin{sidewaystable}
 \centering
 \begin{tabular}{lrrlrrrl}
   \hline
@@ -34,12 +34,11 @@ Resource Export (\%GDP) & 14.79 & 22.64 & 0.03** & 14.79 & 14.16 & 0.72 &  \\
 Resource $\times$ Ethnic & 8.61 & 14.43 & 0.01** & 8.61 & 8.33 & 0.82 & \\
   \hline
 \end{tabular}
-\caption{Pre and Post-Matching Balance}
-\label{tab:matching_balance_largen}
 \end{sidewaystable}
+\label{tab:matching_balance_largen}
 
 
-\begin{table}[ht]
+\begin{table}[H]
 \centering
 \begin{tabular}{lrlr}
   \hline

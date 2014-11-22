@@ -23,13 +23,13 @@ At the country year level:
 \begin{conditions*}
 \beta_{k[j]}^{country} &  intercept of $country_k$ to which $countryyear_j$ belongs. In traditional panel data model, this is the country fixed effect. \\
 \text{legis}_j & dummy variable for legislature. This is our parameter of interest. \\
-X_j & matrix of other control variables, including log(GDP), log(GDP per capita), military expenditure (as \% of GDP), oil and mineral export (as \% of GDP), regime duration (years), and authoritarian typology (military, personal, and party as coded by Geddes et. al)
+X_j & matrix of other control variables, including log(GDP), log(GDP per capita), military expenditure (as \% of GDP), oil and mineral export (as \% of GDP) from \citet{WorldBank2012}; regime duration (years), and authoritarian typology (military, personal, and party as coded by \citet{Geddes2014})
 \end{conditions*}
 
 At the country level:
 \begin{conditions*}
-\text{ethnic} & level of ethnic fractionalization as defined by Fearon \\
+\text{ethnic} & level of ethnic fractionalization as defined by \citet{Fearon2003} \\
 \text{region} & matrix of regional dummies
 \end{conditions*}
 
-I fit this model with a Gibbs sampler written in JAGS, running three chains, each has 11,000 iterations with 1,000 burn-ins. The mixing in the traceplot is excellent (i.e. having little autocorrelation) and does not vary across three chains, meaning that our sampling process has accurately approximated the true posterior distribution of the model's parameters. (See \autopageref{sec:modeldiagnostic} for more model diagnostics).
+I fit this model with a Gibbs sampler written in JAGS, running three chains, each has 11,000 iterations with 1,000 burn-ins. The mixing in the traceplot is excellent (i.e. having little autocorrelation) and does not vary across three chains, meaning that our sampling process has accurately approximated the true posterior distribution of the model's parameters \citep{Gelman2006}. (See \autopageref{sec:modeldiagnostic} for more model diagnostics).
