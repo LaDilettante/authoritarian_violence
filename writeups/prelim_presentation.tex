@@ -29,7 +29,7 @@
 \usepackage{amsfonts}              % for blackboard bold, etc
 \usepackage{amsthm}                % better theorem environments
 
-\title[Effect of Authoritarian Legislature]{The Effect of Authoritarian Legislature on Regime-Opposition interaction} % The short title appears at the bottom of every slide, the full title is only on the title page
+\title[Effect of Authoritarian Legislature]{The Effect of Authoritarian Legislature on Regime-Opposition Interaction} % The short title appears at the bottom of every slide, the full title is only on the title page
 
 \author{Anh Le} % Your name
 \institute[Duke] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
@@ -90,12 +90,12 @@
 \frametitle{Regime-Opposition Bargaining Game}
 \begin{itemize}
 \item Violence is the final arbiter in authoritarian politics
-\item Regime-opposition interaction is best modeled as a bargaining game, similar to the bargain between two sovereign states with the option of going to war
+\item Regime-opposition interaction is best modeled as a bargaining game, similar to the bargain between two sovereign states with the option of going to war (Fearon 1995)
 \end{itemize}
 \end{frame}
 
 \begin{frame}
-\frametitle{The Model}
+\frametitle{Regime-Opposition Bargaining Game}
 \centering
 \begin{itemize}
 \item Negotiation about the share $x$ ($0 < x < 1$) of a good given to the opposition
@@ -121,16 +121,20 @@ Violence can still happen if there is:
 \end{frame}
 
 \begin{frame}
-\frametitle{The Model}
+\frametitle{Regime-Opposition Bargaining Game}
 However, authoritarian legislature solves all of these issues
 \begin{itemize}
-\item Elections and legislative session provide information about both sides' capacity
-\item Cost of violent uprising and repression is increased relative to negotiation
-\item Negotiations over multiple issues in the legislature enable side payments
+\item<1> (Information Asymmetry) Elections and legislative session provide information about both sides' capacity
+\item<2> (Small Bargaining Range) Cost of violent uprising and repression is increased relative to negotiation
+\item<3> (Unit indivisibility) Negotiations over multiple issues in the legislature enable side payments
 \end{itemize}
 \end{frame}
 \section{Experimental Design}
-%------------------------------------------------
+
+\begin{frame}
+\frametitle{Business in Vietnam}
+\end{frame}
+
 \begin{frame}
 \frametitle{Experimental Design}
 
@@ -143,10 +147,16 @@ Question: Is approaching National Assembly delegates to express opinions about e
 \end{frame}
 
 \begin{frame}
-\frametitle{Co-variate Balance}
+\frametitle{Checking Experimental Assumption}
+\centering
+\begin{itemize}
+\item<1-2> Balance between the Treated and the Control
+\item<3> Same response rate between the Treated and the Control
+\item<4-5> Balance between Respondents and Non-Respondents
+\end{itemize}
 \begin{columns}[T] % align columns
 \begin{column}{.48\textwidth}
-\adjustbox{max height=\textheight,
+\only<2,5>{\adjustbox{max height=0.3\textheight,
            max width=\textwidth}{
 \begin{tabular}{rrrrl}
   \hline
@@ -193,11 +203,10 @@ Limited Liability & 0.54 & 0.57 & 0.09 & * \\
   Firm owner was an employee at SOE & 0.15 & 0.15 & 0.87 &  \\ 
    \hline
 \end{tabular}       
-}
+}}
 \end{column}%
 \begin{column}{.48\textwidth}
-\onslide<2->
-\adjustbox{max height=\textheight,
+\only<5>{\adjustbox{max height=0.3\textheight,
            max width=\textwidth}{
 \begin{tabular}{rrrrl}
   \hline
@@ -244,7 +253,7 @@ Limited Liability & 0.55 & 0.56 & 0.81 &  \\
   Firm owner was an employee at SOE & 0.15 & 0.14 & 0.48 &  \\ 
    \hline
 \end{tabular}          
-}
+}}
 \end{column}%
 \end{columns}
 \end{frame}
@@ -339,7 +348,7 @@ Akaike Inf. Crit. & 4,510.274 \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Empirical strategy}
+\frametitle{Empirical Strategy}
 \begin{itemize}
 \item Create short panels of four country years
 \item Treatment panel: no legislature in the first year, legislature in the next three years
@@ -349,7 +358,7 @@ Akaike Inf. Crit. & 4,510.274 \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Matching result}
+\frametitle{Matching Result}
 \centering
 \adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
            max width=\textwidth}{
@@ -379,7 +388,7 @@ Resource $\times$ Ethnic & 8.61 & 14.43 & 0.01** & 8.61 & 8.33 & 0.82 & \\
 \end{frame}
 
 \begin{frame}
-\frametitle{Matching result}
+\frametitle{Matching Result}
 \centering
 \adjustbox{max height=\dimexpr\textheight-5.5cm\relax,
            max width=\textwidth}{
@@ -421,9 +430,14 @@ Algeria & 1996 & Sudan & 1992 \\
 \frametitle{Multilevel model}
 \begin{alignat*}{2}
 &{event}_i &&\sim N(\alpha^{countryyear}_{j[i]} + A \cdot \text{sector}_i, \sigma^2_{event}) \\
-&\alpha_j^{countryyear} &&\sim N(\beta_{k[j]}^{country} + \gamma \cdot \text{legis}_j + \Gamma X_j, \sigma_{\alpha}^2) \\
-&\beta_k^{country} &&\sim N(\delta_0 + \delta_{ethnic} \cdot \text{ethnic}_k + D \cdot \text{region}, \sigma_\beta^2) 
+&\alpha_j^{countryyear} &&\sim N(\beta_{k[j]}^{country} + \gamma \cdot \text{legislature}_j + \Gamma X_j, \sigma_{\alpha}^2) \\
+&\beta_k^{country} &&\sim N(\delta_0 + \delta_{ethnic} \cdot \text{ethnic fraction}_k + D \cdot \text{region}, \sigma_\beta^2) 
 \end{alignat*}
+where
+\begin{itemize}
+\item $\text{sector}_i$: fundamentalist, popular protest, insurgent, etc.
+\item $X_j$: log(GDP), log(GDP percap), resource rent, military expenditure, regime duration, type of autocracy
+\end{itemize}
 \end{frame}
 
 \begin{frame}
